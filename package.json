@@ -1,0 +1,14 @@
+{
+  "name": "ts-player",
+  "version": "1.0.0",
+  "description": "ts-player",
+  "author": "laomoi",
+  "license": "CC0-1.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "tsc": "^1.20150623.0"
+  }
+}
