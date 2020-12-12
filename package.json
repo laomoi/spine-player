@@ -9,6 +9,6 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "tsc": "^1.20150623.0"
+    "typescript": "^4.1.3"
   }
 }
