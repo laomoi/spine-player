@@ -1,7 +1,7 @@
 {
-  "name": "ts-player",
+  "name": "spine-player",
   "version": "1.0.0",
-  "description": "ts-player",
+  "description": "spine-player",
   "author": "laomoi",
   "license": "CC0-1.0",
   "main": "main.js",
