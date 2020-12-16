@@ -32,19 +32,24 @@ export default class App {
             vsAttributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 3})
             vsAttributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
 
-            let vertexs =  new Float32Array([
+            let vertices =  new Float32Array([
                 -1, 1, 0.0, 0.0, 1.0,
                 -1, -1, 0.0, 0.0, 0.0,
                 1, 1, 0.0, 1.0, 1.0,
                 1, -1, 0.0, 1.0, 0.0])
+            let indices = new Uint16Array([
+                0, 1, 2,
+                1, 3, 2
+            ])
 
-            let ebo = renderer.createVBO(vertexs, vsAttributes)
+            let vbo = renderer.createVBO(vertices, vsAttributes)
+            let ebo = renderer.createEBO(indices)
             let textureUnit = 0
             let texture = renderer.createTexture(textureImage, textureUnit)
             renderer.useShader(shader)
             renderer.useTexture(texture, textureUnit)
-            renderer.useVBO(ebo)
-            renderer.draw(4, false)
+            renderer.useVBO(vbo, ebo)
+            renderer.draw(indices.length, true)
 
         }
         textureImage.src = path.join(__dirname, "../res/test.png")

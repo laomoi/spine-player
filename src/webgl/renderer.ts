@@ -73,14 +73,14 @@ export default class Renderer {
         return gl.getAttribLocation(shaderProgram, name)
     }
 
-    public createVBO(vertexs:Float32Array, attributes:Array<{location:number, size:number}>=[]) {
+    public createVBO(vertices:Float32Array, attributes:Array<{location:number, size:number}>=[]) {
         let gl = this.gl
         let vbo = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
-        gl.bufferData(gl.ARRAY_BUFFER, vertexs, gl.DYNAMIC_DRAW)
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW)
         //buffer layout
         let offset = 0
-        let floatSize = vertexs.BYTES_PER_ELEMENT
+        let floatSize = vertices.BYTES_PER_ELEMENT
         let vertexSize = 0
         for (let i = 0; i < attributes.length; i++) {
             let attrib = attributes[i]
@@ -116,7 +116,7 @@ export default class Renderer {
         let gl = this.gl
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
         if (ebo) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo)
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
         }
     }
 
