@@ -13,7 +13,15 @@
 <script>
     let App = require("../build-js/app.js")
     let app = new App.default()
-    app.run()
+    let canvas = document.getElementById('canvas')
+    let gl = canvas.getContext('webgl')
+    if (!gl) {
+        console.log("WEBGL FAILED")
+    } else {
+        app.setGL(gl)
+        app.run()
+    }
+    
 </script>
 
 </body>
