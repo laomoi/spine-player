@@ -7,6 +7,8 @@ export default class App {
 
     protected gl:WebGLRenderingContext
 
+    protected showFPSCallback:any = null
+
     public setGL(gl:WebGLRenderingContext) {
         this.gl = gl
     }
@@ -18,6 +20,10 @@ export default class App {
         console.log(renderer)
 
         this.test(renderer)
+    }
+
+    public setShowFPSCallback(callback:any) {
+        this.showFPSCallback = callback
     }
 
     protected test(renderer:Renderer) {

@@ -9,6 +9,7 @@
 <!-- <button id="save" onclick="console.log(window.app)">截图</button> -->
 <canvas id="canvas" width="1024px" height="768px"></canvas>
 
+<div>fps: <span id="fps"></span></div>
 
 <script>
     let App = require("../build-js/app.js")
@@ -18,7 +19,11 @@
     if (!gl) {
         console.log("WEBGL FAILED")
     } else {
+        let fpsElem = document.getElementById("fps");
         app.setGL(gl)
+        app.setShowFPSCallback(function(fps) {
+            fpsElem.innerText = fps.toFixed(2) + ""
+        })
         app.run()
     }
     
