@@ -3,6 +3,8 @@ import Renderer from "./webgl/renderer"
 import fs = require("fs")
 import path = require("path")
 
+let decode = require('image-decode')
+
 export default class App {
 
     protected gl:WebGLRenderingContext
@@ -27,38 +29,79 @@ export default class App {
     }
 
     protected test(renderer:Renderer) {
-        let textureImage = new Image()
-        textureImage.onload = function() { 
-            
-            let vsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.vs"), "utf8")
-            let fsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.fs"), "utf8")
+        // let textureImage = new Image()
+        // textureImage.onload = function() { 
+        //     let {data, width, height} = decode(fs.readFileSync(path.join(__dirname, "../res/test.png")))
+        //     console.log(data, width, height)
 
-            let shader = renderer.createShader(vsSource, fsSource)
-            let vsAttributes:Array<{location:number, size:number}> = []
-            vsAttributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 3})
-            vsAttributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
 
-            let vertices =  new Float32Array([
-                -1, 1, 0.0, 0.0, 1.0,
-                -1, -1, 0.0, 0.0, 0.0,
-                1, 1, 0.0, 1.0, 1.0,
-                1, -1, 0.0, 1.0, 0.0])
-            let indices = new Uint16Array([
-                0, 1, 2,
-                1, 3, 2
-            ])
+        //     let vsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.vs"), "utf8")
+        //     let fsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.fs"), "utf8")
 
-            let vbo = renderer.createVBO(vertices, vsAttributes)
-            let ebo = renderer.createEBO(indices)
-            let textureUnit = 0
-            let texture = renderer.createTexture(textureImage, textureUnit)
-            renderer.useShader(shader)
-            renderer.useTexture(texture, textureUnit)
-            renderer.useVBO(vbo, ebo)
-            renderer.draw(indices.length, true)
+        //     let shader = renderer.createShader(vsSource, fsSource)
+        //     let vsAttributes:Array<{location:number, size:number}> = []
+        //     vsAttributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 3})
+        //     vsAttributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
 
-        }
-        textureImage.src = path.join(__dirname, "../res/test.png")
+        //     let vertices =  new Float32Array([
+        //         -1, 1, 0.0, 0.0, 1.0,
+        //         -1, -1, 0.0, 0.0, 0.0,
+        //         1, 1, 0.0, 1.0, 1.0,
+        //         1, -1, 0.0, 1.0, 0.0])
+        //     let indices = new Uint16Array([
+        //         0, 1, 2,
+        //         1, 3, 2
+        //     ])
+
+        //     let vbo = renderer.createVBO(vertices, vsAttributes)
+        //     let ebo = renderer.createEBO(indices)
+        //     let textureUnit = 0
+        //     // let texture = renderer.createTexture(textureImage, textureUnit)
+        //     let texture = renderer.createTexture(0, null, data, width, height)
+
+        //     renderer.useShader(shader)
+        //     renderer.useTexture(texture, textureUnit)
+        //     renderer.useVBO(vbo, ebo)
+        //     renderer.draw(indices.length, true)
+
+
+        // }
+        // textureImage.src = path.join(__dirname, "../res/test.png")
+
+
+        let {data, width, height} = decode(fs.readFileSync(path.join(__dirname, "../res/test.png")))
+        // console.log(data, width, height)
+
+
+        let vsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.vs"), "utf8")
+        let fsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.fs"), "utf8")
+
+        let shader = renderer.createShader(vsSource, fsSource)
+        let vsAttributes:Array<{location:number, size:number}> = []
+        vsAttributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 3})
+        vsAttributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
+
+        let vertices =  new Float32Array([
+            -1, 1, 0.0, 0.0, 1.0,
+            -1, -1, 0.0, 0.0, 0.0,
+            1, 1, 0.0, 1.0, 1.0,
+            1, -1, 0.0, 1.0, 0.0])
+        let indices = new Uint16Array([
+            0, 1, 2,
+            1, 3, 2
+        ])
+
+        let vbo = renderer.createVBO(vertices, vsAttributes)
+        let ebo = renderer.createEBO(indices)
+        let textureUnit = 0
+        // let texture = renderer.createTexture(textureImage, textureUnit)
+        let texture = renderer.createTexture(0, null, data, width, height)
+
+        renderer.useShader(shader)
+        renderer.useTexture(texture, textureUnit)
+        renderer.useVBO(vbo, ebo)
+        renderer.draw(indices.length, true)
+
 
 
 
