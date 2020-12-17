@@ -41,9 +41,10 @@ class Mesh {
     protected shader:WebGLShader
     protected attributes:Array<{location:number, size:number}> = []
 
-    //use for vbo, ebo
+    //use for vbo, ebo drawing
     protected vertices:Float32Array
     protected bytesPerVertex:number
+    protected vertsDirty:boolean = false
     public vbo:WebGLBuffer = null
     public ebo:WebGLBuffer = null
 
@@ -53,6 +54,7 @@ class Mesh {
 
     public setImage(file:string) {
         this.texture = Texture.getTexture(file, this.renderer)
+        this.vertsDirty = true
         this.onSetImage()
     }
 
@@ -82,6 +84,7 @@ class Mesh {
             this.vertices = new Float32Array(this.points.length * this.bytesPerVertex)
         } 
         this.updateVertices()
+        this.vertsDirty = false
     }
 
     protected updateVertices() {
@@ -94,7 +97,6 @@ class Mesh {
 
         if (this.vbo == null){
             this.vbo = this.renderer.createVBO(this.vertices)
-            this.renderer.updateVBOLayout(this.vbo, this.bytesPerVertex, this.attributes)
         } else {
             this.renderer.updateVBO(this.vbo, this.vertices)
         }
@@ -106,9 +108,12 @@ class Mesh {
 
 
     public draw() {
+        if (this.vertsDirty) {
+            this.update()
+        }
         this.renderer.useShader(this.shader)
         this.renderer.useTexture(this.texture.webglTexture, this.texture.textureUnit)
-        this.renderer.useVBO(this.vbo)
+        this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes)
         this.renderer.useEBO(this.ebo)
         this.renderer.draw(this.indices.length, true)
     }
@@ -152,7 +157,6 @@ export default class Test {
         sprite1.setMeshAttributes(attributes)
         sprite1.x = 100
         sprite1.y = 100
-        sprite1.update()
         this.meshes.push(sprite1)
 
 
@@ -161,8 +165,7 @@ export default class Test {
         sprite2.setShader(shader)
         sprite2.setMeshAttributes(attributes)
         sprite2.x = 200
-        sprite2.y = 100
-        sprite2.update()
+        sprite2.y = 200
         this.meshes.push(sprite2)
 
         this._inited = true

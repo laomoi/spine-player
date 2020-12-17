@@ -104,9 +104,24 @@ export default class Renderer {
         gl.bufferData(gl.ARRAY_BUFFER, vertexs, gl.DYNAMIC_DRAW)
     }
 
-    public updateVBOLayout(vbo:WebGLBuffer, bytesPerVertex:number, attributes:Array<{location:number, size:number}>=[]) {
-        this.useVBO(vbo)
+    // public updateVBOLayout(vbo:WebGLBuffer, bytesPerVertex:number, attributes:Array<{location:number, size:number}>=[]) {
+    //     this.useVBO(vbo)
+    //     let gl = this.gl
+    //     let offset = 0
+    //     let floatSize = Float32Array.BYTES_PER_ELEMENT
+    //     for (let i = 0; i < attributes.length; i++) {
+    //         let attrib = attributes[i]
+    //         let location = attrib.location
+    //         let sizeOfAttrib = attrib.size
+    //         gl.enableVertexAttribArray(location)
+    //         gl.vertexAttribPointer(location, sizeOfAttrib, gl.FLOAT, false, bytesPerVertex, offset * floatSize)
+    //         offset += sizeOfAttrib
+    //     }
+    // }
+
+    public useVBO(vbo:WebGLBuffer, bytesPerVertex:number, attributes:Array<{location:number, size:number}>) {
         let gl = this.gl
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
         let offset = 0
         let floatSize = Float32Array.BYTES_PER_ELEMENT
         for (let i = 0; i < attributes.length; i++) {
@@ -117,11 +132,6 @@ export default class Renderer {
             gl.vertexAttribPointer(location, sizeOfAttrib, gl.FLOAT, false, bytesPerVertex, offset * floatSize)
             offset += sizeOfAttrib
         }
-    }
-
-    public useVBO(vbo:WebGLBuffer) {
-        let gl = this.gl
-        gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
     }
 
     
