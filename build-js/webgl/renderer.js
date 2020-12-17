@@ -6,12 +6,22 @@ var Renderer = (function () {
     Renderer.prototype.setGL = function (gl) {
         this.gl = gl;
     };
-    Renderer.prototype.createTexture = function (image, n) {
+    Renderer.prototype.createTexture = function (n, image, buffer, width, height) {
+        if (image === void 0) { image = null; }
+        if (buffer === void 0) { buffer = null; }
+        if (width === void 0) { width = 0; }
+        if (height === void 0) { height = 0; }
         var gl = this.gl;
         var texture = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0 + n);
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        if (buffer) {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
+        }
+        else {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        }
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -63,14 +73,14 @@ var Renderer = (function () {
         var gl = this.gl;
         return gl.getAttribLocation(shaderProgram, name);
     };
-    Renderer.prototype.createVBO = function (vertexs, attributes) {
+    Renderer.prototype.createVBO = function (vertices, attributes) {
         if (attributes === void 0) { attributes = []; }
         var gl = this.gl;
         var vbo = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-        gl.bufferData(gl.ARRAY_BUFFER, vertexs, gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
         var offset = 0;
-        var floatSize = vertexs.BYTES_PER_ELEMENT;
+        var floatSize = vertices.BYTES_PER_ELEMENT;
         var vertexSize = 0;
         for (var i = 0; i < attributes.length; i++) {
             var attrib = attributes[i];
@@ -104,7 +114,7 @@ var Renderer = (function () {
         var gl = this.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         if (ebo) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vbo);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
         }
     };
     Renderer.prototype.draw = function (vertexCount, usingEBO) {

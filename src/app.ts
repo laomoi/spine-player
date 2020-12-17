@@ -1,9 +1,7 @@
+import Test from "./examples/test"
 import Renderer from "./webgl/renderer"
 
-import fs = require("fs")
-import path = require("path")
 
-let decode = require('image-decode')
 
 export default class App {
 
@@ -11,100 +9,45 @@ export default class App {
 
     protected showFPSCallback:any = null
 
+    protected renderer:Renderer = null
+    protected test:Test = new Test()
+
     public setGL(gl:WebGLRenderingContext) {
         this.gl = gl
     }
 
     public run() {
-        console.log("run app")
-        let renderer = new Renderer()
-        renderer.setGL(this.gl)
-        console.log(renderer)
+        this.renderer = new Renderer()
+        this.renderer.setGL(this.gl)
 
-        this.test(renderer)
+        let then = 0
+        let lastShowFPS = 0
+        let loopWrap = (now:number) => {
+            now *= 0.001                        
+            const deltaTime = now - then    
+            if (then > 0 && deltaTime > 0 && this.showFPSCallback != null) {
+                if (now - lastShowFPS > 0.3) {
+                    const fps = 1 / deltaTime  
+                    this.showFPSCallback(fps)
+                    lastShowFPS = now
+                }
+                
+            }      
+            then = now     
+            this.loop()
+            requestAnimationFrame(loopWrap)
+        }
+
+        loopWrap(0)
     }
 
     public setShowFPSCallback(callback:any) {
         this.showFPSCallback = callback
     }
 
-    protected test(renderer:Renderer) {
-        // let textureImage = new Image()
-        // textureImage.onload = function() { 
-        //     let {data, width, height} = decode(fs.readFileSync(path.join(__dirname, "../res/test.png")))
-        //     console.log(data, width, height)
-
-
-        //     let vsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.vs"), "utf8")
-        //     let fsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.fs"), "utf8")
-
-        //     let shader = renderer.createShader(vsSource, fsSource)
-        //     let vsAttributes:Array<{location:number, size:number}> = []
-        //     vsAttributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 3})
-        //     vsAttributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
-
-        //     let vertices =  new Float32Array([
-        //         -1, 1, 0.0, 0.0, 1.0,
-        //         -1, -1, 0.0, 0.0, 0.0,
-        //         1, 1, 0.0, 1.0, 1.0,
-        //         1, -1, 0.0, 1.0, 0.0])
-        //     let indices = new Uint16Array([
-        //         0, 1, 2,
-        //         1, 3, 2
-        //     ])
-
-        //     let vbo = renderer.createVBO(vertices, vsAttributes)
-        //     let ebo = renderer.createEBO(indices)
-        //     let textureUnit = 0
-        //     // let texture = renderer.createTexture(textureImage, textureUnit)
-        //     let texture = renderer.createTexture(0, null, data, width, height)
-
-        //     renderer.useShader(shader)
-        //     renderer.useTexture(texture, textureUnit)
-        //     renderer.useVBO(vbo, ebo)
-        //     renderer.draw(indices.length, true)
-
-
-        // }
-        // textureImage.src = path.join(__dirname, "../res/test.png")
-
-
-        let {data, width, height} = decode(fs.readFileSync(path.join(__dirname, "../res/test.png")))
-        // console.log(data, width, height)
-
-
-        let vsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.vs"), "utf8")
-        let fsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.fs"), "utf8")
-
-        let shader = renderer.createShader(vsSource, fsSource)
-        let vsAttributes:Array<{location:number, size:number}> = []
-        vsAttributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 3})
-        vsAttributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
-
-        let vertices =  new Float32Array([
-            -1, 1, 0.0, 0.0, 1.0,
-            -1, -1, 0.0, 0.0, 0.0,
-            1, 1, 0.0, 1.0, 1.0,
-            1, -1, 0.0, 1.0, 0.0])
-        let indices = new Uint16Array([
-            0, 1, 2,
-            1, 3, 2
-        ])
-
-        let vbo = renderer.createVBO(vertices, vsAttributes)
-        let ebo = renderer.createEBO(indices)
-        let textureUnit = 0
-        // let texture = renderer.createTexture(textureImage, textureUnit)
-        let texture = renderer.createTexture(0, null, data, width, height)
-
-        renderer.useShader(shader)
-        renderer.useTexture(texture, textureUnit)
-        renderer.useVBO(vbo, ebo)
-        renderer.draw(indices.length, true)
-
-
-
-
-       
+    protected loop() {
+        this.test.run(this.renderer)
     }
+
+
 }

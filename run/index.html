@@ -22,7 +22,7 @@
         let fpsElem = document.getElementById("fps");
         app.setGL(gl)
         app.setShowFPSCallback(function(fps) {
-            fpsElem.innerText = fps.toFixed(2) + ""
+            fpsElem.innerText = fps.toFixed(1) + ""
         })
         app.run()
     }

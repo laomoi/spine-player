@@ -1,45 +1,43 @@
 "use strict";
 exports.__esModule = true;
+var test_1 = require("./examples/test");
 var renderer_1 = require("./webgl/renderer");
-var fs = require("fs");
-var path = require("path");
 var App = (function () {
     function App() {
+        this.showFPSCallback = null;
+        this.renderer = null;
+        this.test = new test_1["default"]();
     }
     App.prototype.setGL = function (gl) {
         this.gl = gl;
     };
     App.prototype.run = function () {
-        console.log("run app");
-        var renderer = new renderer_1["default"]();
-        renderer.setGL(this.gl);
-        console.log(renderer);
-        this.test(renderer);
-    };
-    App.prototype.test = function (renderer) {
-        var textureImage = new Image();
-        textureImage.onload = function () {
-            var vsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.vs"), "utf8");
-            var fsSource = fs.readFileSync(path.join(__dirname, "../res/shaders/test.fs"), "utf8");
-            var shader = renderer.createShader(vsSource, fsSource);
-            var vsAttributes = [];
-            vsAttributes.push({ location: renderer.getAttrLocation(shader, "a_Position"), size: 3 });
-            vsAttributes.push({ location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2 });
-            var vertexs = new Float32Array([
-                -1, 1, 0.0, 0.0, 1.0,
-                -1, -1, 0.0, 0.0, 0.0,
-                1, 1, 0.0, 1.0, 1.0,
-                1, -1, 0.0, 1.0, 0.0
-            ]);
-            var ebo = renderer.createVBO(vertexs, vsAttributes);
-            var textureUnit = 0;
-            var texture = renderer.createTexture(textureImage, textureUnit);
-            renderer.useShader(shader);
-            renderer.useTexture(texture, textureUnit);
-            renderer.useVBO(ebo);
-            renderer.draw(4, false);
+        var _this = this;
+        this.renderer = new renderer_1["default"]();
+        this.renderer.setGL(this.gl);
+        var then = 0;
+        var lastShowFPS = 0;
+        var loopWrap = function (now) {
+            now *= 0.001;
+            var deltaTime = now - then;
+            if (then > 0 && deltaTime > 0 && _this.showFPSCallback != null) {
+                if (now - lastShowFPS > 0.3) {
+                    var fps = 1 / deltaTime;
+                    _this.showFPSCallback(fps);
+                    lastShowFPS = now;
+                }
+            }
+            then = now;
+            _this.loop();
+            requestAnimationFrame(loopWrap);
         };
-        textureImage.src = path.join(__dirname, "../res/test.png");
+        loopWrap(0);
+    };
+    App.prototype.setShowFPSCallback = function (callback) {
+        this.showFPSCallback = callback;
+    };
+    App.prototype.loop = function () {
+        this.test.run(this.renderer);
     };
     return App;
 }());
