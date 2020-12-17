@@ -3,8 +3,10 @@ exports.__esModule = true;
 var Renderer = (function () {
     function Renderer() {
     }
-    Renderer.prototype.setGL = function (gl) {
+    Renderer.prototype.setGL = function (gl, width, height) {
         this.gl = gl;
+        this.width = width;
+        this.height = height;
     };
     Renderer.prototype.createTexture = function (n, image, buffer, width, height) {
         if (image === void 0) { image = null; }
@@ -126,6 +128,12 @@ var Renderer = (function () {
         else {
             gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
         }
+    };
+    Renderer.prototype.normalizeScreenX = function (x) {
+        return (x / this.width) * 2 - 1;
+    };
+    Renderer.prototype.normalizeScreenY = function (y) {
+        return (y / this.height) * 2 - 1;
     };
     return Renderer;
 }());

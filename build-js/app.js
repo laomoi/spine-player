@@ -8,13 +8,15 @@ var App = (function () {
         this.renderer = null;
         this.test = new test_1["default"]();
     }
-    App.prototype.setGL = function (gl) {
+    App.prototype.setGL = function (gl, width, height) {
         this.gl = gl;
+        this.width = width;
+        this.height = height;
     };
     App.prototype.run = function () {
         var _this = this;
         this.renderer = new renderer_1["default"]();
-        this.renderer.setGL(this.gl);
+        this.renderer.setGL(this.gl, this.width, this.height);
         var then = 0;
         var lastShowFPS = 0;
         var loopWrap = function (now) {

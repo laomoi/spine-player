@@ -13,6 +13,26 @@ export default class Test {
     protected textureUnit:number = 0
     protected vbo:WebGLBuffer = null
     protected ebo:WebGLBuffer = null
+
+
+    protected createVerticesFromImage(renderer:Renderer, width:number, height:number, x:number, y:number) {
+        //屏幕上的4个点坐标
+        let points = [
+            [0, height, 0, 1],      //左上角 x, y, u, v
+            [0, 0, 0, 0],           //左下角
+            [width, height, 1, 1],  //右上角
+            [width, 0, 1, 0],       //右下角
+        ]
+
+        let vertices = []
+        for (let p of points) {
+            vertices.push(renderer.normalizeScreenX(p[0] + x))
+            vertices.push(renderer.normalizeScreenY(p[1] + y))
+            vertices.push(p[2])
+            vertices.push(p[3])
+        }
+        return new Float32Array(vertices)
+    }
     protected init(renderer:Renderer) {
         let {data, width, height} = decode(fs.readFileSync(path.join(__dirname, "../../res/test.png")))
 
@@ -24,12 +44,10 @@ export default class Test {
         vsAttributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 2})
         vsAttributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
 
-        let vertices =  new Float32Array([
-            -1, 1, 0.0, 1.0,
-            -1, -1, 0.0, 0.0,
-            1, 1, 1.0, 1.0,
-            1, -1,  1.0, 0.0])
-        
+        //屏幕上的4个点坐标
+
+
+        let vertices = this.createVerticesFromImage(renderer, width, height, 100, 100)
         let indices = new Uint16Array([
             0, 1, 2,
             1, 3, 2

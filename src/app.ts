@@ -10,15 +10,19 @@ export default class App {
     protected showFPSCallback:any = null
 
     protected renderer:Renderer = null
+    protected width:number
+    protected height:number
     protected test:Test = new Test()
 
-    public setGL(gl:WebGLRenderingContext) {
+    public setGL(gl:WebGLRenderingContext, width:number, height:number) {
         this.gl = gl
+        this.width = width
+        this.height = height
     }
 
     public run() {
         this.renderer = new Renderer()
-        this.renderer.setGL(this.gl)
+        this.renderer.setGL(this.gl, this.width, this.height)
 
         let then = 0
         let lastShowFPS = 0

@@ -10,5 +10,8 @@
   },
   "devDependencies": {
     "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "image-decode": "^1.2.2"
   }
 }

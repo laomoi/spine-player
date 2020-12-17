@@ -11,6 +11,23 @@ var Test = (function () {
         this.vbo = null;
         this.ebo = null;
     }
+    Test.prototype.createVerticesFromImage = function (renderer, width, height, x, y) {
+        var points = [
+            [0, height, 0, 1],
+            [0, 0, 0, 0],
+            [width, height, 1, 1],
+            [width, 0, 1, 0],
+        ];
+        var vertices = [];
+        for (var _i = 0, points_1 = points; _i < points_1.length; _i++) {
+            var p = points_1[_i];
+            vertices.push(renderer.normalizeScreenX(p[0] + x));
+            vertices.push(renderer.normalizeScreenY(p[1] + y));
+            vertices.push(p[2]);
+            vertices.push(p[3]);
+        }
+        return new Float32Array(vertices);
+    };
     Test.prototype.init = function (renderer) {
         var _a = decode(fs.readFileSync(path.join(__dirname, "../../res/test.png"))), data = _a.data, width = _a.width, height = _a.height;
         var vsSource = fs.readFileSync(path.join(__dirname, "../../res/shaders/test.vs"), "utf8");
@@ -19,12 +36,7 @@ var Test = (function () {
         var vsAttributes = [];
         vsAttributes.push({ location: renderer.getAttrLocation(shader, "a_Position"), size: 2 });
         vsAttributes.push({ location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2 });
-        var vertices = new Float32Array([
-            -1, 1, 0.0, 1.0,
-            -1, -1, 0.0, 0.0,
-            1, 1, 1.0, 1.0,
-            1, -1, 1.0, 0.0
-        ]);
+        var vertices = this.createVerticesFromImage(renderer, width, height, 100, 100);
         var indices = new Uint16Array([
             0, 1, 2,
             1, 3, 2

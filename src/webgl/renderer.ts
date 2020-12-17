@@ -1,13 +1,18 @@
 export default class Renderer {
     protected gl:WebGLRenderingContext
+    protected width:number
+    protected height:number
 
     constructor() {
 
     }
 
-    public setGL(gl:any) {
+    public setGL(gl:WebGLRenderingContext, width:number, height:number) {
         this.gl = gl
+        this.width = width
+        this.height = height
     }
+
 
     public createTexture( n:number, image: HTMLImageElement | ImageBitmap=null, buffer:ArrayBufferView=null, width:number=0, height:number=0):WebGLTexture {
         let gl = this.gl
@@ -135,4 +140,11 @@ export default class Renderer {
         }
     }
 
+    public normalizeScreenX(x:number){
+        return (x / this.width) * 2 - 1
+    }
+
+    public normalizeScreenY(y:number){
+        return (y / this.height) * 2 - 1
+    }
 }
