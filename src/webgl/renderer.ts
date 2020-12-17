@@ -14,6 +14,10 @@ export default class Renderer {
     }
 
 
+    public clear() {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
+    }
+
     public createTexture( n:number, image: HTMLImageElement | ImageBitmap=null, buffer:ArrayBufferView=null, width:number=0, height:number=0):WebGLTexture {
         let gl = this.gl
         let texture:WebGLTexture = gl.createTexture()
@@ -84,30 +88,15 @@ export default class Renderer {
         return gl.getAttribLocation(shaderProgram, name)
     }
 
-    public createVBO(vertices:Float32Array, attributes:Array<{location:number, size:number}>=[]) {
+    public createVBO(vertices:Float32Array ) {
         let gl = this.gl
         let vbo = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW)
-        //buffer layout
-        let offset = 0
-        let floatSize = vertices.BYTES_PER_ELEMENT
-        let vertexSize = 0
-        for (let i = 0; i < attributes.length; i++) {
-            let attrib = attributes[i]
-            let sizeOfAttrib = attrib.size
-            vertexSize += sizeOfAttrib*floatSize
-        }
-        for (let i = 0; i < attributes.length; i++) {
-            let attrib = attributes[i]
-            let location = attrib.location
-            let sizeOfAttrib = attrib.size
-            gl.enableVertexAttribArray(location)
-            gl.vertexAttribPointer(location, sizeOfAttrib, gl.FLOAT, false, vertexSize, offset * floatSize)
-            offset += sizeOfAttrib
-        }
+        
         return vbo
     }
+
 
     public updateVBO(vbo:WebGLBuffer, vertexs:Float32Array) {
         let gl = this.gl
@@ -115,6 +104,27 @@ export default class Renderer {
         gl.bufferData(gl.ARRAY_BUFFER, vertexs, gl.DYNAMIC_DRAW)
     }
 
+    public updateVBOLayout(vbo:WebGLBuffer, bytesPerVertex:number, attributes:Array<{location:number, size:number}>=[]) {
+        this.useVBO(vbo)
+        let gl = this.gl
+        let offset = 0
+        let floatSize = Float32Array.BYTES_PER_ELEMENT
+        for (let i = 0; i < attributes.length; i++) {
+            let attrib = attributes[i]
+            let location = attrib.location
+            let sizeOfAttrib = attrib.size
+            gl.enableVertexAttribArray(location)
+            gl.vertexAttribPointer(location, sizeOfAttrib, gl.FLOAT, false, bytesPerVertex, offset * floatSize)
+            offset += sizeOfAttrib
+        }
+    }
+
+    public useVBO(vbo:WebGLBuffer) {
+        let gl = this.gl
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
+    }
+
+    
     public createEBO(indices:any) {
         let gl = this.gl
         let ebo = gl.createBuffer()
@@ -123,9 +133,8 @@ export default class Renderer {
         return ebo
     }
 
-    public useVBO(vbo:WebGLBuffer, ebo:WebGLBuffer=null) {
+    public useEBO(ebo:WebGLBuffer=null) {
         let gl = this.gl
-        gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
         if (ebo) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
         }
