@@ -2,6 +2,8 @@ import Renderer from "../webgl/renderer"
 import fs = require("fs")
 import path = require("path")
 import Spine from "../core/spine"
+import SpineData from "../core/spine-data"
+import SpineUtils from "../core/spine-utils"
 
 export default class TestSpine {
     
@@ -13,8 +15,11 @@ export default class TestSpine {
         renderer.enableBlend()
         renderer.setAlphaBlendMode()
 
-
-        let spine = new Spine(path.join(__dirname, "../../res/skeleton.json"), "", "")
+        let jsonFile = path.join(__dirname, "../../res/skeleton.json")
+        let spineData = new SpineData()
+        spineData.fromJson(SpineUtils.readJsonFile(jsonFile))
+        let spine = new Spine(spineData)
+        spine.setAnimation("animation")
         this.spines.push(spine)
 
         this._inited = true

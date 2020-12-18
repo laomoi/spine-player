@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const spine_1 = require("../core/spine");
+const spine_data_1 = require("../core/spine-data");
+const spine_utils_1 = require("../core/spine-utils");
 class TestSpine {
     constructor() {
         this._inited = false;
@@ -10,7 +12,11 @@ class TestSpine {
     init(renderer) {
         renderer.enableBlend();
         renderer.setAlphaBlendMode();
-        let spine = new spine_1.default(path.join(__dirname, "../../res/skeleton.json"), "", "");
+        let jsonFile = path.join(__dirname, "../../res/skeleton.json");
+        let spineData = new spine_data_1.default();
+        spineData.fromJson(spine_utils_1.default.readJsonFile(jsonFile));
+        let spine = new spine_1.default(spineData);
+        spine.setAnimation("animation");
         this.spines.push(spine);
         this._inited = true;
     }

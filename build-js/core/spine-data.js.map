@@ -1,1 +1,1 @@
-{"version":3,"file":"spine-data.js","sourceRoot":"","sources":["../../src/core/spine-data.ts"],"names":[],"mappings":";;AAAA,MAAqB,SAAS;IAEnB,QAAQ,CAAC,IAAQ;IAExB,CAAC;CAEJ;AAND,4BAMC"}
+{"version":3,"file":"spine-data.js","sourceRoot":"","sources":["../../src/core/spine-data.ts"],"names":[],"mappings":";;AACA,MAAqB,SAAS;IAEnB,QAAQ,CAAC,IAAQ;IAExB,CAAC;IAGM,YAAY,CAAC,SAAgB;QAChC,OAAO,IAAI,CAAA;IACf,CAAC;CACJ;AAVD,4BAUC"}

@@ -25,7 +25,6 @@ export default class Test {
         sprite1.setMeshAttributes(attributes)
         sprite1.x = 100
         sprite1.y = 100
-        
         this.meshes.push(sprite1)
 
 
