@@ -1,4 +1,4 @@
-import Renderer from "./renderer"
+import Renderer, { ShaderUniform, SHADER_UNIFORM_TYPE } from "./renderer"
 import Texture from "./texture"
 
 export default class Mesh {
@@ -9,6 +9,7 @@ export default class Mesh {
     protected renderer:Renderer
     protected shader:WebGLShader
     protected attributes:Array<{location:number, size:number}> = []
+    protected uniforms:Array<ShaderUniform> = []
 
     private _x:number = 0
     private _y:number = 0
@@ -56,6 +57,16 @@ export default class Mesh {
         this.shader = shader
     }
 
+    public setUniform(uniform:ShaderUniform) {
+        for (let i=0;i<this.uniforms.length;i++){
+            if (this.uniforms[i].name == uniform.name){
+                this.uniforms.splice(i, 1)
+                break
+            }
+        }
+        this.uniforms.push(uniform)
+    }
+
     public setMeshAttributes(attributes:Array<{location:number, size:number}>) {
         this.attributes = attributes
 
@@ -78,11 +89,12 @@ export default class Mesh {
     }
 
     protected updateVertices() {
+        //计算世界坐标
         for (let p=0;p<this.points.length;p++) {
-            this.vertices[p*4] = this.renderer.normalizeScreenX(this.points[p][0] + this.x)
-            this.vertices[p*4+1] = this.renderer.normalizeScreenY(this.points[p][1] + this.y)
-            this.vertices[p*4+2] = this.points[p][2]
-            this.vertices[p*4+3] = this.points[p][3]
+            this.vertices[p*4] = this.points[p][0] + this.x
+            this.vertices[p*4+1] = this.points[p][1] + this.y
+            this.vertices[p*4+2] = this.points[p][2] //u
+            this.vertices[p*4+3] = this.points[p][3] //v
         }
 
         if (this.vbo == null){
@@ -101,7 +113,8 @@ export default class Mesh {
         if (this.vertsDirty) {
             this.update()
         }
-        this.renderer.useShader(this.shader)
+
+        this.renderer.useShader(this.shader, this.uniforms)
         this.renderer.useTexture(this.texture.webglTexture, 0) //mesh use 1 texture currently
         this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes)
         this.renderer.useEBO(this.ebo)

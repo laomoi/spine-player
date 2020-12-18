@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mesh_1 = require("../webgl/mesh");
-const renderer_1 = require("../webgl/renderer");
 const fs = require("fs");
 const path = require("path");
 class Test {
@@ -19,7 +18,6 @@ class Test {
         let sprite1 = new mesh_1.Sprite(renderer);
         sprite1.setImage("test.png");
         sprite1.setShader(shader);
-        sprite1.setUniform({ name: "u_Sampler", value: 0, type: renderer_1.SHADER_UNIFORM_TYPE.TYPE_1i });
         sprite1.setMeshAttributes(attributes);
         sprite1.x = 100;
         sprite1.y = 100;
@@ -27,13 +25,10 @@ class Test {
         let sprite2 = new mesh_1.Sprite(renderer);
         sprite2.setImage("test2.png");
         sprite2.setShader(shader);
-        sprite2.setUniform({ name: "u_Sampler", value: 0, type: renderer_1.SHADER_UNIFORM_TYPE.TYPE_1i });
         sprite2.setMeshAttributes(attributes);
         sprite2.x = 200;
         sprite2.y = 200;
         this.meshes.push(sprite2);
-        renderer.enableBlend();
-        renderer.setAlphaBlendMode();
         this._inited = true;
     }
     run(renderer) {
@@ -53,4 +48,4 @@ class Test {
     }
 }
 exports.default = Test;
-//# sourceMappingURL=test.js.map
+//# sourceMappingURL=test%20copy.js.map

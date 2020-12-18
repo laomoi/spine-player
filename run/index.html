@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Player</title>
-    <!-- <script type="text/javascript" src="./bundle.js"></script> -->
+    <title>SPine Player</title>
+
 </head>
 <body>
 <!-- <button id="save" onclick="console.log(window.app)">截图</button> -->
@@ -20,12 +20,18 @@
         console.log("WEBGL FAILED")
     } else {
         let fpsElem = document.getElementById("fps");
-        app.setGL(gl)
+        app.setGL(gl, canvas.clientWidth, canvas.clientHeight)
         app.setShowFPSCallback(function(fps) {
             fpsElem.innerText = fps.toFixed(1) + ""
         })
         app.run()
     }
+
+
+    //start spectorjs
+    var SPECTOR = require("spectorjs");
+    var spector = new SPECTOR.Spector();
+    spector.displayUI();
     
 </script>
 

@@ -1,18 +1,29 @@
+import Matrix4 from "./matrix4"
+
+export enum SHADER_UNIFORM_TYPE{
+    TYPE_1i = 1,
+    TYPE_MATRIX_4F = 2,
+}
+
+export interface ShaderUniform{
+    name:string,
+    value:any,
+    type:SHADER_UNIFORM_TYPE
+}
+
 export default class Renderer {
     protected gl:WebGLRenderingContext
     protected width:number
     protected height:number
-
-    constructor() {
-        
-    }
+    protected matrixProjection:Matrix4
 
     public setGL(gl:WebGLRenderingContext, width:number, height:number) {
         this.gl = gl
         this.width = width
         this.height = height
+        this.matrixProjection = new Matrix4()
+        this.matrixProjection.setOrg(width, height)//投影矩阵, 2D里简单处理成： 把世界坐标转成[-1,1]的值
     }
-
 
     public clear() {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
@@ -35,7 +46,6 @@ export default class Renderer {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
         return texture
     }
-
 
     public useTexture(texture:WebGLTexture, unit:number) {
         let gl = this.gl
@@ -63,7 +73,7 @@ export default class Renderer {
         return shaderProgram
     }
 
-    public useShader(shaderProgram:WebGLProgram, uniforms:Array<{name:string, value:any, type:string}>=null) {
+    public useShader(shaderProgram:WebGLProgram, uniforms:Array<ShaderUniform>=null) {
         let gl = this.gl
         gl.useProgram(shaderProgram)
         if (uniforms != null) {
@@ -73,15 +83,23 @@ export default class Renderer {
                 let type = u.type
                 let location = gl.getUniformLocation(shaderProgram, name)
                 if (location != null) {
-                    if (type == "1i") {
+                    if (type == SHADER_UNIFORM_TYPE.TYPE_1i) {
                         gl.uniform1i(location, value)
+                    } else if (type == SHADER_UNIFORM_TYPE.TYPE_MATRIX_4F) {
+                        gl.uniformMatrix4fv(location, false, value)
                     } else {
                         console.log("not supporting uniform type")
                     }
                 }
             }
         }
+        //default set projection matrix
+        let pLocation = gl.getUniformLocation(shaderProgram, "P")
+        if (pLocation){
+            gl.uniformMatrix4fv(pLocation, false, this.matrixProjection.value)
+        }
     }
+
 
     public getAttrLocation(shaderProgram:WebGLProgram, name:string) {
         let gl = this.gl
@@ -143,15 +161,7 @@ export default class Renderer {
         }
     }
 
-    public normalizeScreenX(x:number){
-        return (x / this.width) * 2 - 1
-    }
-
-    public normalizeScreenY(y:number){
-        return (y / this.height) * 2 - 1
-    }
-
-    public setBlendMode (srcBlend: number, dstBlend: number) {
+    public setBlendMode(srcBlend: number, dstBlend: number) {
         let gl = this.gl
         gl.blendFunc(srcBlend, dstBlend)
     }

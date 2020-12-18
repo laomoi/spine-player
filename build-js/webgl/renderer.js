@@ -1,20 +1,26 @@
 "use strict";
-exports.__esModule = true;
-var Renderer = (function () {
-    function Renderer() {
-    }
-    Renderer.prototype.setGL = function (gl, width, height) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SHADER_UNIFORM_TYPE = void 0;
+const matrix4_1 = require("./matrix4");
+var SHADER_UNIFORM_TYPE;
+(function (SHADER_UNIFORM_TYPE) {
+    SHADER_UNIFORM_TYPE[SHADER_UNIFORM_TYPE["TYPE_1i"] = 1] = "TYPE_1i";
+    SHADER_UNIFORM_TYPE[SHADER_UNIFORM_TYPE["TYPE_MATRIX_4F"] = 2] = "TYPE_MATRIX_4F";
+})(SHADER_UNIFORM_TYPE = exports.SHADER_UNIFORM_TYPE || (exports.SHADER_UNIFORM_TYPE = {}));
+class Renderer {
+    setGL(gl, width, height) {
         this.gl = gl;
         this.width = width;
         this.height = height;
-    };
-    Renderer.prototype.createTexture = function (n, image, buffer, width, height) {
-        if (image === void 0) { image = null; }
-        if (buffer === void 0) { buffer = null; }
-        if (width === void 0) { width = 0; }
-        if (height === void 0) { height = 0; }
-        var gl = this.gl;
-        var texture = gl.createTexture();
+        this.matrixProjection = new matrix4_1.default();
+        this.matrixProjection.setOrg(width, height);
+    }
+    clear() {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    }
+    createTexture(n, image = null, buffer = null, width = 0, height = 0) {
+        let gl = this.gl;
+        let texture = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0 + n);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -29,40 +35,41 @@ var Renderer = (function () {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         return texture;
-    };
-    Renderer.prototype.useTexture = function (texture, n) {
-        var gl = this.gl;
-        gl.activeTexture(gl.TEXTURE0 + n);
+    }
+    useTexture(texture, unit) {
+        let gl = this.gl;
+        gl.activeTexture(gl.TEXTURE0 + unit);
         gl.bindTexture(gl.TEXTURE_2D, texture);
-    };
-    Renderer.prototype.createShader = function (vsSource, fsSource) {
-        var gl = this.gl;
-        var vertShader = gl.createShader(gl.VERTEX_SHADER);
+    }
+    createShader(vsSource, fsSource) {
+        let gl = this.gl;
+        let vertShader = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(vertShader, vsSource);
         gl.compileShader(vertShader);
-        var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+        let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(fragShader, fsSource);
         gl.compileShader(fragShader);
-        var shaderProgram = gl.createProgram();
+        let shaderProgram = gl.createProgram();
         gl.attachShader(shaderProgram, vertShader);
         gl.attachShader(shaderProgram, fragShader);
         gl.linkProgram(shaderProgram);
         return shaderProgram;
-    };
-    Renderer.prototype.useShader = function (shaderProgram, uniforms) {
-        if (uniforms === void 0) { uniforms = null; }
-        var gl = this.gl;
+    }
+    useShader(shaderProgram, uniforms = null) {
+        let gl = this.gl;
         gl.useProgram(shaderProgram);
         if (uniforms != null) {
-            for (var _i = 0, uniforms_1 = uniforms; _i < uniforms_1.length; _i++) {
-                var u = uniforms_1[_i];
-                var name_1 = u.name;
-                var value = u.value;
-                var type = u.type;
-                var location_1 = gl.getUniformLocation(shaderProgram, name_1);
-                if (location_1 != null) {
-                    if (type == "1i") {
-                        gl.uniform1i(location_1, value);
+            for (let u of uniforms) {
+                let name = u.name;
+                let value = u.value;
+                let type = u.type;
+                let location = gl.getUniformLocation(shaderProgram, name);
+                if (location != null) {
+                    if (type == SHADER_UNIFORM_TYPE.TYPE_1i) {
+                        gl.uniform1i(location, value);
+                    }
+                    else if (type == SHADER_UNIFORM_TYPE.TYPE_MATRIX_4F) {
+                        gl.uniformMatrix4fv(location, false, value);
                     }
                     else {
                         console.log("not supporting uniform type");
@@ -70,72 +77,74 @@ var Renderer = (function () {
                 }
             }
         }
-    };
-    Renderer.prototype.getAttrLocation = function (shaderProgram, name) {
-        var gl = this.gl;
+        let pLocation = gl.getUniformLocation(shaderProgram, "P");
+        if (pLocation) {
+            gl.uniformMatrix4fv(pLocation, false, this.matrixProjection.value);
+        }
+    }
+    getAttrLocation(shaderProgram, name) {
+        let gl = this.gl;
         return gl.getAttribLocation(shaderProgram, name);
-    };
-    Renderer.prototype.createVBO = function (vertices, attributes) {
-        if (attributes === void 0) { attributes = []; }
-        var gl = this.gl;
-        var vbo = gl.createBuffer();
+    }
+    createVBO(vertices) {
+        let gl = this.gl;
+        let vbo = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
-        var offset = 0;
-        var floatSize = vertices.BYTES_PER_ELEMENT;
-        var vertexSize = 0;
-        for (var i = 0; i < attributes.length; i++) {
-            var attrib = attributes[i];
-            var sizeOfAttrib = attrib.size;
-            vertexSize += sizeOfAttrib * floatSize;
-        }
-        for (var i = 0; i < attributes.length; i++) {
-            var attrib = attributes[i];
-            var location_2 = attrib.location;
-            var sizeOfAttrib = attrib.size;
-            gl.enableVertexAttribArray(location_2);
-            gl.vertexAttribPointer(location_2, sizeOfAttrib, gl.FLOAT, false, vertexSize, offset * floatSize);
-            offset += sizeOfAttrib;
-        }
         return vbo;
-    };
-    Renderer.prototype.updateVBO = function (vbo, vertexs) {
-        var gl = this.gl;
+    }
+    updateVBO(vbo, vertexs) {
+        let gl = this.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, vertexs, gl.DYNAMIC_DRAW);
-    };
-    Renderer.prototype.createEBO = function (indices) {
-        var gl = this.gl;
-        var ebo = gl.createBuffer();
+    }
+    useVBO(vbo, bytesPerVertex, attributes) {
+        let gl = this.gl;
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        let offset = 0;
+        let floatSize = Float32Array.BYTES_PER_ELEMENT;
+        for (let i = 0; i < attributes.length; i++) {
+            let attrib = attributes[i];
+            let location = attrib.location;
+            let sizeOfAttrib = attrib.size;
+            gl.enableVertexAttribArray(location);
+            gl.vertexAttribPointer(location, sizeOfAttrib, gl.FLOAT, false, bytesPerVertex, offset * floatSize);
+            offset += sizeOfAttrib;
+        }
+    }
+    createEBO(indices) {
+        let gl = this.gl;
+        let ebo = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
         return ebo;
-    };
-    Renderer.prototype.useVBO = function (vbo, ebo) {
-        if (ebo === void 0) { ebo = null; }
-        var gl = this.gl;
-        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    }
+    useEBO(ebo = null) {
+        let gl = this.gl;
         if (ebo) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
         }
-    };
-    Renderer.prototype.draw = function (vertexCount, usingEBO) {
-        if (usingEBO === void 0) { usingEBO = true; }
-        var gl = this.gl;
+    }
+    draw(vertexCount, usingEBO = true) {
+        let gl = this.gl;
         if (usingEBO) {
             gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
         }
         else {
             gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
         }
-    };
-    Renderer.prototype.normalizeScreenX = function (x) {
-        return (x / this.width) * 2 - 1;
-    };
-    Renderer.prototype.normalizeScreenY = function (y) {
-        return (y / this.height) * 2 - 1;
-    };
-    return Renderer;
-}());
-exports["default"] = Renderer;
+    }
+    setBlendMode(srcBlend, dstBlend) {
+        let gl = this.gl;
+        gl.blendFunc(srcBlend, dstBlend);
+    }
+    setAlphaBlendMode() {
+        let gl = this.gl;
+        this.setBlendMode(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    }
+    enableBlend() {
+        this.gl.enable(this.gl.BLEND);
+    }
+}
+exports.default = Renderer;
 //# sourceMappingURL=renderer.js.map
