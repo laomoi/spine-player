@@ -4,7 +4,7 @@ export default class Renderer {
     protected height:number
 
     constructor() {
-
+        
     }
 
     public setGL(gl:WebGLRenderingContext, width:number, height:number) {
@@ -104,21 +104,6 @@ export default class Renderer {
         gl.bufferData(gl.ARRAY_BUFFER, vertexs, gl.DYNAMIC_DRAW)
     }
 
-    // public updateVBOLayout(vbo:WebGLBuffer, bytesPerVertex:number, attributes:Array<{location:number, size:number}>=[]) {
-    //     this.useVBO(vbo)
-    //     let gl = this.gl
-    //     let offset = 0
-    //     let floatSize = Float32Array.BYTES_PER_ELEMENT
-    //     for (let i = 0; i < attributes.length; i++) {
-    //         let attrib = attributes[i]
-    //         let location = attrib.location
-    //         let sizeOfAttrib = attrib.size
-    //         gl.enableVertexAttribArray(location)
-    //         gl.vertexAttribPointer(location, sizeOfAttrib, gl.FLOAT, false, bytesPerVertex, offset * floatSize)
-    //         offset += sizeOfAttrib
-    //     }
-    // }
-
     public useVBO(vbo:WebGLBuffer, bytesPerVertex:number, attributes:Array<{location:number, size:number}>) {
         let gl = this.gl
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
@@ -165,5 +150,19 @@ export default class Renderer {
 
     public normalizeScreenY(y:number){
         return (y / this.height) * 2 - 1
+    }
+
+    public setBlendMode (srcBlend: number, dstBlend: number) {
+        let gl = this.gl
+        gl.blendFunc(srcBlend, dstBlend)
+    }
+
+    public setAlphaBlendMode(){
+        let gl = this.gl
+        this.setBlendMode(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+    }
+
+    public enableBlend(){
+        this.gl.enable(this.gl.BLEND)
     }
 }

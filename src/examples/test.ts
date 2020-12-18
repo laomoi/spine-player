@@ -168,6 +168,8 @@ export default class Test {
         sprite2.y = 200
         this.meshes.push(sprite2)
 
+        renderer.enableBlend()
+        renderer.setAlphaBlendMode()
         this._inited = true
     }
 
