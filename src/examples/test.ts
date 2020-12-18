@@ -45,6 +45,15 @@ export default class Test {
             this.init(renderer)
         }
         renderer.clear()
+
+        for (let mesh of this.meshes) {
+            //moving animation
+            mesh.x += 1
+            if (mesh.x >= 400) {
+                mesh.x = 0
+            }
+        }
+
         for (let mesh of this.meshes) {
             mesh.draw()
         }

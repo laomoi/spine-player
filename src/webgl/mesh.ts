@@ -3,14 +3,15 @@ import Texture from "./texture"
 
 export default class Mesh {
     public texture:Texture
-    public x:number
-    public y:number
     public points:Array<any> = []
     public indices:Uint16Array = null
 
     protected renderer:Renderer
     protected shader:WebGLShader
     protected attributes:Array<{location:number, size:number}> = []
+
+    private _x:number = 0
+    private _y:number = 0
 
     //use for vbo, ebo drawing
     protected vertices:Float32Array
@@ -21,6 +22,24 @@ export default class Mesh {
 
     constructor(renderer:Renderer) {
         this.renderer = renderer
+    }
+
+    public get x():number {
+        return this._x
+    }
+
+    public get y():number {
+        return this._y
+    }
+    
+    public set x(x:number){
+        this._x = x
+        this.vertsDirty = true
+    }
+
+    public set y(y:number){
+        this._y = y
+        this.vertsDirty = true
     }
 
     public setImage(file:string) {
