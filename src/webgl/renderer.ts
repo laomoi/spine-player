@@ -37,9 +37,9 @@ export default class Renderer {
     }
 
 
-    public useTexture(texture:WebGLTexture, n:number) {
+    public useTexture(texture:WebGLTexture, unit:number) {
         let gl = this.gl
-        gl.activeTexture(gl.TEXTURE0 + n)
+        gl.activeTexture(gl.TEXTURE0 + unit)
         gl.bindTexture(gl.TEXTURE_2D, texture)
     }
 
@@ -93,7 +93,6 @@ export default class Renderer {
         let vbo = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW)
-        
         return vbo
     }
 

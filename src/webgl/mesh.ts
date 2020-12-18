@@ -83,7 +83,7 @@ export default class Mesh {
             this.update()
         }
         this.renderer.useShader(this.shader)
-        this.renderer.useTexture(this.texture.webglTexture, this.texture.textureUnit)
+        this.renderer.useTexture(this.texture.webglTexture, 0) //mesh use 1 texture currently
         this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes)
         this.renderer.useEBO(this.ebo)
         this.renderer.draw(this.indices.length, true)
