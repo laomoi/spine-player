@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class SpineData {
-    fromJson(json) {
+    setJson(json) {
+        this.json = json;
     }
     hasAnimation(animation) {
         return true;

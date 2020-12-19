@@ -1,34 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mesh_1 = require("../webgl/mesh");
-const renderer_1 = require("../webgl/renderer");
-const fs = require("fs");
-const path = require("path");
+const shader_1 = require("../webgl/shader");
 class Test {
     constructor() {
         this._inited = false;
         this.meshes = [];
     }
     init(renderer) {
-        let vsSource = fs.readFileSync(path.join(__dirname, "../../res/shaders/test.vs"), "utf8");
-        let fsSource = fs.readFileSync(path.join(__dirname, "../../res/shaders/test.fs"), "utf8");
-        let shader = renderer.createShader(vsSource, fsSource);
-        let attributes = [];
-        attributes.push({ location: renderer.getAttrLocation(shader, "a_Position"), size: 2 });
-        attributes.push({ location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2 });
+        let defaultShader = new shader_1.DefaultShader(renderer);
         let sprite1 = new mesh_1.Sprite(renderer);
         sprite1.setImage("test.png");
-        sprite1.setShader(shader);
-        sprite1.setUniform({ name: "u_Sampler", value: 0, type: renderer_1.SHADER_UNIFORM_TYPE.TYPE_1i });
-        sprite1.setMeshAttributes(attributes);
+        sprite1.setShader(defaultShader);
         sprite1.x = 100;
         sprite1.y = 100;
         this.meshes.push(sprite1);
         let sprite2 = new mesh_1.Sprite(renderer);
         sprite2.setImage("test2.png");
-        sprite2.setShader(shader);
-        sprite2.setUniform({ name: "u_Sampler", value: 0, type: renderer_1.SHADER_UNIFORM_TYPE.TYPE_1i });
-        sprite2.setMeshAttributes(attributes);
+        sprite2.setShader(defaultShader);
         sprite2.x = 200;
         sprite2.y = 200;
         this.meshes.push(sprite2);

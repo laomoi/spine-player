@@ -1,19 +1,31 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const matrix4_1 = require("../webgl/matrix4");
 class SpineBone {
     constructor() {
-        this.name = "";
-        this.length = 0;
-        this.x = 0;
-        this.y = 0;
-        this.rotation = 0;
-        this.parent = "";
+        this.json = null;
+        this.worldTransform = new matrix4_1.default();
     }
-    get parentBone() {
-        if (this.parent == "") {
-            return null;
-        }
-        return null;
+    setJson(json) {
+        this.json = json;
+    }
+    get name() {
+        return this.json.name != null ? this.json.name : "";
+    }
+    get length() {
+        return this.json.length != null ? this.json.length : 0;
+    }
+    get parent() {
+        return this.json.parent != null ? this.json.parent : "";
+    }
+    get setupX() {
+        return this.json.x != null ? this.json.x : 0;
+    }
+    get setupY() {
+        return this.json.y != null ? this.json.y : 0;
+    }
+    get setupRotation() {
+        return this.json.rotation != null ? this.json.rotation : 0;
     }
 }
 exports.default = SpineBone;

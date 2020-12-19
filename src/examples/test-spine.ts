@@ -17,7 +17,7 @@ export default class TestSpine {
 
         let jsonFile = path.join(__dirname, "../../res/skeleton.json")
         let spineData = new SpineData()
-        spineData.fromJson(SpineUtils.readJsonFile(jsonFile))
+        spineData.setJson(SpineUtils.readJsonFile(jsonFile))
         let spine = new Spine(spineData)
         spine.setAnimation("animation")
         this.spines.push(spine)

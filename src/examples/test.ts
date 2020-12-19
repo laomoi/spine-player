@@ -2,6 +2,7 @@ import Mesh, { Sprite } from "../webgl/mesh"
 import Renderer, { SHADER_UNIFORM_TYPE } from "../webgl/renderer"
 import fs = require("fs")
 import path = require("path")
+import Shader, { DefaultShader } from "../webgl/shader"
 
 export default class Test {
     
@@ -10,19 +11,11 @@ export default class Test {
     protected meshes:Array<Mesh> = []
     
     protected init(renderer:Renderer) {
-        let vsSource = fs.readFileSync(path.join(__dirname, "../../res/shaders/test.vs"), "utf8")
-        let fsSource = fs.readFileSync(path.join(__dirname, "../../res/shaders/test.fs"), "utf8")
-
-        let shader = renderer.createShader(vsSource, fsSource)
-        let attributes:Array<{location:number, size:number}> = []
-        attributes.push({location: renderer.getAttrLocation(shader, "a_Position"), size: 2})
-        attributes.push({location: renderer.getAttrLocation(shader, "a_TexCoord"), size: 2})
+        let defaultShader = new DefaultShader(renderer)
 
         let sprite1 = new Sprite(renderer)
         sprite1.setImage("test.png")
-        sprite1.setShader(shader)
-        sprite1.setUniform({name:"u_Sampler", value:0, type:SHADER_UNIFORM_TYPE.TYPE_1i }) //unit 0 sampler
-        sprite1.setMeshAttributes(attributes)
+        sprite1.setShader(defaultShader)
         sprite1.x = 100
         sprite1.y = 100
         this.meshes.push(sprite1)
@@ -30,9 +23,7 @@ export default class Test {
 
         let sprite2 = new Sprite(renderer)
         sprite2.setImage("test2.png")
-        sprite2.setShader(shader)
-        sprite2.setUniform({name:"u_Sampler", value:0, type:SHADER_UNIFORM_TYPE.TYPE_1i })
-        sprite2.setMeshAttributes(attributes)
+        sprite2.setShader(defaultShader)
         sprite2.x = 200
         sprite2.y = 200
         this.meshes.push(sprite2)

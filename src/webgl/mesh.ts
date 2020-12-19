@@ -1,4 +1,5 @@
 import Renderer, { ShaderUniform, SHADER_UNIFORM_TYPE } from "./renderer"
+import Shader from "./shader"
 import Texture from "./texture"
 
 export default class Mesh {
@@ -7,7 +8,7 @@ export default class Mesh {
     public indices:Uint16Array = null
 
     protected renderer:Renderer
-    protected shader:WebGLShader
+    protected shader:Shader
     protected attributes:Array<{location:number, size:number}> = []
     protected uniforms:Array<ShaderUniform> = []
 
@@ -53,8 +54,10 @@ export default class Mesh {
 
     }
 
-    public setShader(shader:WebGLShader) {
+
+    public setShader(shader:Shader) {
         this.shader = shader
+        this.shader.onMeshUseShader(this)
     }
 
     public setUniform(uniform:ShaderUniform) {
@@ -114,7 +117,7 @@ export default class Mesh {
             this.update()
         }
 
-        this.renderer.useShader(this.shader, this.uniforms)
+        this.renderer.useShader(this.shader.webglShader, this.uniforms)
         this.renderer.useTexture(this.texture.webglTexture, 0) //mesh use 1 texture currently
         this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes)
         this.renderer.useEBO(this.ebo)

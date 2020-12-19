@@ -38,6 +38,7 @@ class Mesh {
     }
     setShader(shader) {
         this.shader = shader;
+        this.shader.onMeshUseShader(this);
     }
     setUniform(uniform) {
         for (let i = 0; i < this.uniforms.length; i++) {
@@ -86,7 +87,7 @@ class Mesh {
         if (this.vertsDirty) {
             this.update();
         }
-        this.renderer.useShader(this.shader, this.uniforms);
+        this.renderer.useShader(this.shader.webglShader, this.uniforms);
         this.renderer.useTexture(this.texture.webglTexture, 0);
         this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes);
         this.renderer.useEBO(this.ebo);

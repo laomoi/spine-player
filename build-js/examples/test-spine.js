@@ -14,7 +14,7 @@ class TestSpine {
         renderer.setAlphaBlendMode();
         let jsonFile = path.join(__dirname, "../../res/skeleton.json");
         let spineData = new spine_data_1.default();
-        spineData.fromJson(spine_utils_1.default.readJsonFile(jsonFile));
+        spineData.setJson(spine_utils_1.default.readJsonFile(jsonFile));
         let spine = new spine_1.default(spineData);
         spine.setAnimation("animation");
         this.spines.push(spine);
