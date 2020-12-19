@@ -21,6 +21,27 @@ class Spine {
             this.bones.push(bone);
             this.bonesDict[bone.name] = bone;
         }
+        let boneDepthDict = {};
+        for (let bone of this.bones) {
+            this.calBoneDepth(bone, boneDepthDict);
+        }
+        this.bones.sort(function (a, b) {
+            return boneDepthDict[a.name] - boneDepthDict[b.name];
+        });
+    }
+    calBoneDepth(bone, dict) {
+        if (dict[bone.name] != null) {
+            return dict[bone.name];
+        }
+        if (bone.parent == "") {
+            dict[bone.name] = 0;
+        }
+        else {
+            let parentBone = this.bonesDict[bone.parent];
+            let parentDepth = this.calBoneDepth(parentBone, dict);
+            dict[bone.name] = parentDepth + 1;
+        }
+        return dict[bone.name];
     }
     setAnimation(animation) {
         if (this.data.hasAnimation(animation)) {
@@ -33,6 +54,10 @@ class Spine {
     resetAnimation() {
     }
     update() {
+        for (let bone of this.bones) {
+            let parent = this.bonesDict[bone.parent];
+            bone.updateWorldTransform(parent);
+        }
     }
     updateBoneDebugMesh() {
     }
@@ -42,7 +67,6 @@ class Spine {
                 this.boneDebugMesh = new mesh_1.default(renderer);
                 this.boneDebugMesh.x = this.x;
                 this.boneDebugMesh.y = this.y;
-                this.boneDebugMesh;
             }
             else {
             }

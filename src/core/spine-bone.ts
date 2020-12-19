@@ -4,6 +4,11 @@ import { BoneJson } from "./spine-data"
 export default class SpineBone {
     protected json:BoneJson = null
     public worldTransform:Matrix4 = new Matrix4()
+    protected localTransform:Matrix4 = new Matrix4()
+
+    public x:number
+    public y:number
+    public rotation:number
 
     public setJson(json:BoneJson) {
         this.json = json
@@ -33,4 +38,12 @@ export default class SpineBone {
         return this.json.rotation != null ? this.json.rotation : 0
     }
 
+    public updateWorldTransform(parent:SpineBone){
+        //todo update local transform
+        if (parent) {
+            this.localTransform.multiply(parent.worldTransform, this.worldTransform)
+        } else {
+            this.worldTransform.setArrayValue(this.localTransform.arrayValue)
+        }
+    }
 }

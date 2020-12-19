@@ -77,7 +77,7 @@ class Renderer {
         }
         let pLocation = gl.getUniformLocation(shaderProgram, "P");
         if (pLocation) {
-            gl.uniformMatrix4fv(pLocation, false, this.matrixProjection.value);
+            gl.uniformMatrix4fv(pLocation, false, this.matrixProjection.arrayValue);
         }
     }
     getAttrLocation(shaderProgram, name) {

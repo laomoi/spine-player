@@ -5,6 +5,7 @@ class SpineBone {
     constructor() {
         this.json = null;
         this.worldTransform = new matrix4_1.default();
+        this.localTransform = new matrix4_1.default();
     }
     setJson(json) {
         this.json = json;
@@ -26,6 +27,14 @@ class SpineBone {
     }
     get setupRotation() {
         return this.json.rotation != null ? this.json.rotation : 0;
+    }
+    updateWorldTransform(parent) {
+        if (parent) {
+            this.localTransform.multiply(parent.worldTransform, this.worldTransform);
+        }
+        else {
+            this.worldTransform.setArrayValue(this.localTransform.arrayValue);
+        }
     }
 }
 exports.default = SpineBone;

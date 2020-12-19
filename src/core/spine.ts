@@ -33,6 +33,28 @@ export default class Spine {
             this.bones.push(bone)
             this.bonesDict[bone.name] = bone
         }
+        //根据骨骼的父子关系，计算骨骼更新的先后顺序
+        let boneDepthDict:{[k:string]:number} = {}
+        for (let bone of this.bones) {
+            this.calBoneDepth(bone, boneDepthDict)
+        }
+        this.bones.sort(function(a:any, b:any){
+            return boneDepthDict[a.name] - boneDepthDict[b.name]
+        })
+    }
+
+    protected calBoneDepth(bone:SpineBone, dict:any) {
+        if (dict[bone.name] != null){
+            return dict[bone.name]
+        }
+        if (bone.parent == "") {
+            dict[bone.name] = 0
+        } else {
+            let parentBone = this.bonesDict[bone.parent]
+            let parentDepth = this.calBoneDepth(parentBone, dict)
+            dict[bone.name] = parentDepth + 1
+        }
+        return dict[bone.name]
     }
 
     public setAnimation(animation:string) {
@@ -51,7 +73,11 @@ export default class Spine {
 
     public update(){
         //update bones animation
-     
+        //update bones world transform
+        for (let bone of this.bones){
+            let parent = this.bonesDict[bone.parent]
+            bone.updateWorldTransform(parent)
+        }
     }
 
     protected updateBoneDebugMesh() {
@@ -71,7 +97,6 @@ export default class Spine {
                 this.boneDebugMesh = new Mesh(renderer)
                 this.boneDebugMesh.x = this.x
                 this.boneDebugMesh.y = this.y
-                this.boneDebugMesh
             } else {
 
             }            

@@ -13,8 +13,8 @@ export default class App {
     protected renderer:Renderer = null
     protected width:number
     protected height:number
-    protected test:Test = new Test()
-    // protected test:TestSpine = new TestSpine()
+    // protected test:Test = new Test()
+    protected test:TestSpine = new TestSpine()
 
     public setGL(gl:WebGLRenderingContext, width:number, height:number) {
         this.gl = gl
