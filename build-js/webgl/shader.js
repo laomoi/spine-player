@@ -1,9 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DefaultShader = void 0;
-const renderer_1 = require("./renderer");
+exports.DefaultShader = exports.SHADER_UNIFORM_TYPE = void 0;
 const fs = require("fs");
 const path = require("path");
+var SHADER_UNIFORM_TYPE;
+(function (SHADER_UNIFORM_TYPE) {
+    SHADER_UNIFORM_TYPE[SHADER_UNIFORM_TYPE["TYPE_1i"] = 1] = "TYPE_1i";
+    SHADER_UNIFORM_TYPE[SHADER_UNIFORM_TYPE["TYPE_MATRIX_4F"] = 2] = "TYPE_MATRIX_4F";
+})(SHADER_UNIFORM_TYPE = exports.SHADER_UNIFORM_TYPE || (exports.SHADER_UNIFORM_TYPE = {}));
 class Shader {
     constructor(renderer) {
         this.renderer = renderer;
@@ -29,7 +33,7 @@ class DefaultShader extends Shader {
         this.attributes.push({ location: this.renderer.getAttrLocation(this.webglShader, "a_TexCoord"), size: 2 });
     }
     onMeshUseShader(mesh) {
-        mesh.setUniform({ name: "u_Sampler", value: 0, type: renderer_1.SHADER_UNIFORM_TYPE.TYPE_1i });
+        mesh.setUniform({ name: "u_Sampler", value: 0, type: SHADER_UNIFORM_TYPE.TYPE_1i });
         mesh.setMeshAttributes(this.attributes);
     }
 }

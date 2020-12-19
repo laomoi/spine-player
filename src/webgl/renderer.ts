@@ -1,21 +1,14 @@
 import Matrix4 from "./matrix4"
+import Shader, { DefaultShader, ShaderUniform, SHADER_UNIFORM_TYPE } from "./shader"
 
-export enum SHADER_UNIFORM_TYPE{
-    TYPE_1i = 1,
-    TYPE_MATRIX_4F = 2,
-}
-
-export interface ShaderUniform{
-    name:string,
-    value:any,
-    type:SHADER_UNIFORM_TYPE
-}
 
 export default class Renderer {
     protected gl:WebGLRenderingContext
     protected width:number
     protected height:number
     protected matrixProjection:Matrix4
+    protected defaultShader:Shader = null
+
 
     public setGL(gl:WebGLRenderingContext, width:number, height:number) {
         this.gl = gl
@@ -173,5 +166,12 @@ export default class Renderer {
 
     public enableBlend(){
         this.gl.enable(this.gl.BLEND)
+    }
+
+    public getDefaultShader():Shader{
+        if (this.defaultShader == null){
+            this.defaultShader = new DefaultShader(this)
+        }
+        return this.defaultShader
     }
 }

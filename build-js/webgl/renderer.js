@@ -1,13 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SHADER_UNIFORM_TYPE = void 0;
 const matrix4_1 = require("./matrix4");
-var SHADER_UNIFORM_TYPE;
-(function (SHADER_UNIFORM_TYPE) {
-    SHADER_UNIFORM_TYPE[SHADER_UNIFORM_TYPE["TYPE_1i"] = 1] = "TYPE_1i";
-    SHADER_UNIFORM_TYPE[SHADER_UNIFORM_TYPE["TYPE_MATRIX_4F"] = 2] = "TYPE_MATRIX_4F";
-})(SHADER_UNIFORM_TYPE = exports.SHADER_UNIFORM_TYPE || (exports.SHADER_UNIFORM_TYPE = {}));
+const shader_1 = require("./shader");
 class Renderer {
+    constructor() {
+        this.defaultShader = null;
+    }
     setGL(gl, width, height) {
         this.gl = gl;
         this.width = width;
@@ -65,10 +63,10 @@ class Renderer {
                 let type = u.type;
                 let location = gl.getUniformLocation(shaderProgram, name);
                 if (location != null) {
-                    if (type == SHADER_UNIFORM_TYPE.TYPE_1i) {
+                    if (type == shader_1.SHADER_UNIFORM_TYPE.TYPE_1i) {
                         gl.uniform1i(location, value);
                     }
-                    else if (type == SHADER_UNIFORM_TYPE.TYPE_MATRIX_4F) {
+                    else if (type == shader_1.SHADER_UNIFORM_TYPE.TYPE_MATRIX_4F) {
                         gl.uniformMatrix4fv(location, false, value);
                     }
                     else {
@@ -144,6 +142,12 @@ class Renderer {
     }
     enableBlend() {
         this.gl.enable(this.gl.BLEND);
+    }
+    getDefaultShader() {
+        if (this.defaultShader == null) {
+            this.defaultShader = new shader_1.DefaultShader(this);
+        }
+        return this.defaultShader;
     }
 }
 exports.default = Renderer;

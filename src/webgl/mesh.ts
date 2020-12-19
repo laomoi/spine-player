@@ -1,5 +1,5 @@
-import Renderer, { ShaderUniform, SHADER_UNIFORM_TYPE } from "./renderer"
-import Shader from "./shader"
+import Renderer  from "./renderer"
+import Shader, { ShaderUniform } from "./shader"
 import Texture from "./texture"
 
 export default class Mesh {
@@ -51,9 +51,8 @@ export default class Mesh {
     }
 
     protected onSetImage() {
-
+        this.setShader(this.renderer.getDefaultShader())
     }
-
 
     public setShader(shader:Shader) {
         this.shader = shader
@@ -128,6 +127,7 @@ export default class Mesh {
 
 export class Sprite extends Mesh {
     public onSetImage() {
+        super.onSetImage()
         this.points = [
             [0, this.texture.imageHeight, 0, 1],                //左上角 x, y, u, v
             [0, 0, 0, 0],                                       //左下角

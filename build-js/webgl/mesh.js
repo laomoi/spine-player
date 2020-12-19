@@ -35,6 +35,7 @@ class Mesh {
         this.onSetImage();
     }
     onSetImage() {
+        this.setShader(this.renderer.getDefaultShader());
     }
     setShader(shader) {
         this.shader = shader;
@@ -97,6 +98,7 @@ class Mesh {
 exports.default = Mesh;
 class Sprite extends Mesh {
     onSetImage() {
+        super.onSetImage();
         this.points = [
             [0, this.texture.imageHeight, 0, 1],
             [0, 0, 0, 0],

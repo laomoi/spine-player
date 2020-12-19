@@ -1,6 +1,18 @@
-import Renderer, { SHADER_UNIFORM_TYPE } from "./renderer";
+import Renderer from "./renderer";
 import fs = require("fs")
 import path = require("path")
+
+export enum SHADER_UNIFORM_TYPE{
+    TYPE_1i = 1,
+    TYPE_MATRIX_4F = 2,
+}
+
+export interface ShaderUniform{
+    name:string,
+    value:any,
+    type:SHADER_UNIFORM_TYPE
+}
+
 
 export default class Shader {
     public webglShader:WebGLProgram
