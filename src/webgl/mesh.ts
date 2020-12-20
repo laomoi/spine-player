@@ -18,6 +18,7 @@ export default class Mesh {
     //use for vbo, ebo drawing
     protected vertices:Float32Array
     protected bytesPerVertex:number
+    protected elementsCountPerVertex:number
     protected vertsDirty:boolean = false
     public vbo:WebGLBuffer = null
     public ebo:WebGLBuffer = null
@@ -73,18 +74,21 @@ export default class Mesh {
         this.attributes = attributes
 
         let bytesPerVertex = 0
+        let elementsCountPerVertex = 0
         for (let i = 0; i < attributes.length; i++) {
             let attrib = attributes[i]
             let sizeOfAttrib = attrib.size
             bytesPerVertex += sizeOfAttrib*Float32Array.BYTES_PER_ELEMENT
+            elementsCountPerVertex += sizeOfAttrib
         }
         this.bytesPerVertex = bytesPerVertex
+        this.elementsCountPerVertex = elementsCountPerVertex 
     }
 
 
     public update() {
         if (this.vertices == null) {
-            this.vertices = new Float32Array(this.points.length * this.bytesPerVertex)
+            this.vertices = new Float32Array(this.points.length * this.elementsCountPerVertex)
         } 
         this.updateVertices()
         this.vertsDirty = false
@@ -115,12 +119,15 @@ export default class Mesh {
         if (this.vertsDirty) {
             this.update()
         }
-
         this.renderer.useShader(this.shader.webglShader, this.uniforms)
         this.renderer.useTexture(this.texture.webglTexture, 0) //mesh use 1 texture currently
         this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes)
         this.renderer.useEBO(this.ebo)
         this.renderer.draw(this.indices.length, true)
+    }
+
+    public setVertsDiry(){
+        this.vertsDirty = true
     }
 
 }

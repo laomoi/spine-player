@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mesh_1 = require("../webgl/mesh");
 const spine_bone_1 = require("./spine-bone");
+const spine_debug_mesh_1 = require("./spine-debug-mesh");
 class Spine {
     constructor(data) {
         this.bones = [];
         this.bonesDict = {};
-        this.boneDebugMesh = null;
-        this.showDebugBone = true;
+        this.debugMesh = null;
+        this.showDebugMesh = true;
         this.x = 0;
         this.y = 0;
         this.data = data;
@@ -43,6 +43,9 @@ class Spine {
         }
         return dict[bone.name];
     }
+    getBones() {
+        return this.bones;
+    }
     setAnimation(animation) {
         if (this.data.hasAnimation(animation)) {
             this.animation = animation;
@@ -56,20 +59,20 @@ class Spine {
     update() {
         for (let bone of this.bones) {
             let parent = this.bonesDict[bone.parent];
-            bone.updateWorldTransform(parent);
+            bone.updateTransform(parent);
+            console.log(bone);
         }
     }
     updateBoneDebugMesh() {
     }
     draw(renderer) {
-        if (this.showDebugBone) {
-            if (this.boneDebugMesh == null) {
-                this.boneDebugMesh = new mesh_1.default(renderer);
-                this.boneDebugMesh.x = this.x;
-                this.boneDebugMesh.y = this.y;
+        if (this.showDebugMesh) {
+            if (this.debugMesh == null) {
+                this.debugMesh = new spine_debug_mesh_1.default(renderer);
+                this.debugMesh.setSpine(this);
             }
-            else {
-            }
+            this.debugMesh.updateFromSpine();
+            this.debugMesh.draw();
         }
     }
 }

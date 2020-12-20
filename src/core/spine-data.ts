@@ -4,6 +4,10 @@ export interface BoneJson {
     x?:number,
     y?:number,
     rotation?:number,
+    shearX?:number,
+    shearY?:number,
+    scaleX?:number,
+    scaleY?:number,
     parent?:string
 }
 

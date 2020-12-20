@@ -2,6 +2,7 @@ import Mesh from "../webgl/mesh";
 import Renderer from "../webgl/renderer";
 import SpineBone from "./spine-bone";
 import SpineData from "./spine-data";
+import SpineDebugMesh from "./spine-debug-mesh";
 import SpineUtils from "./spine-utils";
 
 export default class Spine {
@@ -12,11 +13,12 @@ export default class Spine {
     protected bones:Array<SpineBone> = []
     protected bonesDict:{[k:string]:SpineBone} = {}
 
-    protected boneDebugMesh:Mesh = null
+    protected debugMesh:SpineDebugMesh = null
+    public showDebugMesh:boolean = true
 
     protected mesh:Mesh
 
-    public showDebugBone:boolean = true
+
     public x:number = 0 
     public y:number = 0
     
@@ -57,6 +59,10 @@ export default class Spine {
         return dict[bone.name]
     }
 
+    public getBones():Array<SpineBone> {
+        return this.bones
+    }
+
     public setAnimation(animation:string) {
         if (this.data.hasAnimation(animation)){
             this.animation = animation
@@ -76,7 +82,8 @@ export default class Spine {
         //update bones world transform
         for (let bone of this.bones){
             let parent = this.bonesDict[bone.parent]
-            bone.updateWorldTransform(parent)
+            bone.updateTransform(parent)
+            console.log(bone)
         }
     }
 
@@ -92,14 +99,13 @@ export default class Spine {
         //draw bone-debug-mesh
         //draw mesh
 
-        if (this.showDebugBone){
-            if (this.boneDebugMesh == null) {
-                this.boneDebugMesh = new Mesh(renderer)
-                this.boneDebugMesh.x = this.x
-                this.boneDebugMesh.y = this.y
-            } else {
-
-            }            
+        if (this.showDebugMesh){
+            if (this.debugMesh == null) {
+                this.debugMesh = new SpineDebugMesh(renderer)
+                this.debugMesh.setSpine(this)
+            }
+            this.debugMesh.updateFromSpine()
+            this.debugMesh.draw()         
         }
     }
 
