@@ -37,8 +37,8 @@ export default class SpineDebugMesh extends Mesh {
             let pointsPerBone = [
                 [0, boneHeight/2, 0, 1],                        //左上角 x, y, u, v
                 [0, -boneHeight/2, 0, 0],                       //左下角
-                [bone.length, boneHeight/2, 1, 1],  //右上角
-                [bone.length, -boneHeight/2, 1, 0],  //右下角 
+                [bone.length, boneHeight/2, 1, 1],              //右上角
+                [bone.length, -boneHeight/2, 1, 0],             //右下角 
             ]
             for (let p=0;p<pointsPerBone.length;p++) {
                 let pt = pointsPerBone[p]

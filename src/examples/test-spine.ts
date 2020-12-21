@@ -19,12 +19,12 @@ export default class TestSpine {
         let spineData = new SpineData()
         spineData.setJson(SpineUtils.readJsonFile(jsonFile))
         let spine = new Spine(spineData)
-        spine.setAnimation("animation")
+        spine.setAnimation("victory")
         spine.x = 100
         spine.y = 100
         this.spines.push(spine)
-        spine.update()
-        spine.draw(renderer)
+        // spine.update()
+        // spine.draw(renderer)
         this._inited = true
     }
 
@@ -32,14 +32,14 @@ export default class TestSpine {
         if (!this._inited) {
             this.init(renderer)
         }
-        // renderer.clear()
+        renderer.clear()
 
-        // for (let spine of this.spines) {
-        //     spine.update()
-        // }
+        for (let spine of this.spines) {
+            spine.update()
+        }
 
-        // for (let spine of this.spines) {
-        //     spine.draw(renderer)
-        // }
+        for (let spine of this.spines) {
+            spine.draw(renderer)
+        }
     }
 }

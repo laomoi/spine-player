@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const spine_animation_1 = require("./spine-animation");
 const spine_bone_1 = require("./spine-bone");
 const spine_debug_mesh_1 = require("./spine-debug-mesh");
 class Spine {
@@ -8,6 +9,7 @@ class Spine {
         this.bonesDict = {};
         this.debugMesh = null;
         this.showDebugMesh = true;
+        this.spineAnimation = null;
         this.x = 0;
         this.y = 0;
         this.data = data;
@@ -46,24 +48,30 @@ class Spine {
     getBones() {
         return this.bones;
     }
-    setAnimation(animation) {
-        if (this.data.hasAnimation(animation)) {
-            this.animation = animation;
-            this.resetAnimation();
+    getBone(name) {
+        return this.bonesDict[name];
+    }
+    setAnimation(animationName) {
+        let animationJson = this.data.getAnimationData(animationName);
+        if (animationJson != null) {
+            this.spineAnimation = new spine_animation_1.default(this, animationJson);
         }
     }
     setupPos() {
-    }
-    resetAnimation() {
+        this.updateBonesTransform();
     }
     update() {
+        if (this.spineAnimation == null) {
+            return;
+        }
+        this.spineAnimation.update();
+        this.updateBonesTransform();
+    }
+    updateBonesTransform() {
         for (let bone of this.bones) {
             let parent = this.bonesDict[bone.parent];
             bone.updateTransform(parent);
-            console.log(bone);
         }
-    }
-    updateBoneDebugMesh() {
     }
     draw(renderer) {
         if (this.showDebugMesh) {

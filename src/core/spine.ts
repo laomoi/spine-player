@@ -1,15 +1,14 @@
 import Mesh from "../webgl/mesh";
 import Renderer from "../webgl/renderer";
+import SpineAnimation from "./spine-animation";
 import SpineBone from "./spine-bone";
-import SpineData from "./spine-data";
+import SpineData, { AnimationJson } from "./spine-data";
 import SpineDebugMesh from "./spine-debug-mesh";
-import SpineUtils from "./spine-utils";
 
 export default class Spine {
 
     protected data:SpineData
 
-    protected animation:string
     protected bones:Array<SpineBone> = []
     protected bonesDict:{[k:string]:SpineBone} = {}
 
@@ -17,11 +16,12 @@ export default class Spine {
     public showDebugMesh:boolean = true
 
     protected mesh:Mesh
-
+    protected spineAnimation:SpineAnimation = null
 
     public x:number = 0 
     public y:number = 0
     
+
     public constructor(data:SpineData) {
         this.data = data
         this.createBones()
@@ -63,32 +63,36 @@ export default class Spine {
         return this.bones
     }
 
-    public setAnimation(animation:string) {
-        if (this.data.hasAnimation(animation)){
-            this.animation = animation
-            this.resetAnimation()
+    public getBone(name:string):SpineBone {
+        return this.bonesDict[name]
+    }
+
+    public setAnimation(animationName:string) {
+        let animationJson:AnimationJson = this.data.getAnimationData(animationName)
+        if (animationJson != null){
+            this.spineAnimation = new SpineAnimation(this, animationJson)
         }
     }
 
     protected setupPos() {
-    }
-
-    protected resetAnimation() {
-
+        this.updateBonesTransform()
     }
 
     public update(){
-        //update bones animation
-        //update bones world transform
+        if (this.spineAnimation == null) {
+            return
+        }
+
+        this.spineAnimation.update()
+
+        this.updateBonesTransform()
+    }
+
+    protected updateBonesTransform(){
         for (let bone of this.bones){
             let parent = this.bonesDict[bone.parent]
             bone.updateTransform(parent)
-            console.log(bone)
         }
-    }
-
-    protected updateBoneDebugMesh() {
-        
     }
 
     public draw(renderer:Renderer){

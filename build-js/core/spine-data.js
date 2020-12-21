@@ -4,8 +4,8 @@ class SpineData {
     setJson(json) {
         this.json = json;
     }
-    hasAnimation(animation) {
-        return true;
+    getAnimationData(animationName) {
+        return this.json.animations[animationName];
     }
 }
 exports.default = SpineData;

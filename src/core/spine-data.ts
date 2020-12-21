@@ -11,8 +11,30 @@ export interface BoneJson {
     parent?:string
 }
 
+export interface AnimationKeyFrameJson {
+    time?: number,
+    angle?: number,
+    x?: number,
+    y?: number,
+    rotation?:number,
+    curve?: string,
+
+}
+
+export interface AnimationBoneJson {
+    rotate?:Array<AnimationKeyFrameJson>,
+    scale?:Array<AnimationKeyFrameJson>,
+    translate?:Array<AnimationKeyFrameJson>,
+    shear?:Array<AnimationKeyFrameJson>,
+}
+
+export interface AnimationJson {
+    bones:{[k:string]:AnimationBoneJson}
+}
+
 export interface SpineJson {
-    bones:Array<BoneJson>
+    bones:Array<BoneJson>,
+    animations:{[k:string]:AnimationJson}
 }
 
 export default class SpineData {
@@ -22,7 +44,7 @@ export default class SpineData {
         this.json = json
     }
 
-    public hasAnimation(animation:string){
-        return true
+    public getAnimationData(animationName:string):AnimationJson{
+        return this.json.animations[animationName]
     }
 }

@@ -15,7 +15,7 @@ export default class SpineBone {
     protected json:BoneJson = null
     public worldTransform:Matrix4 = new Matrix4()
     protected localTransform:Matrix4 = new Matrix4()
-    protected setupPosValue:BoneSetupPos
+    public setupPosValue:BoneSetupPos
 
     public name:string
     public length:number
