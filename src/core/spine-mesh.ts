@@ -17,7 +17,6 @@ export default class SpineMesh extends Mesh {
         this.atlas = new SpineAtlas(atlas, png, this.renderer)
 
         this.createSlots()
-
         this.setTexture(this.atlas.texture)
     }
 
