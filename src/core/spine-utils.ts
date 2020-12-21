@@ -6,7 +6,8 @@ export default class SpineUtils {
     public static Deg2Radian:number = Math.PI / 180
 
     public static readJsonFile(file:string){
-        let content = fs.readFileSync(file, "utf8")
+        let fullPath = path.join(__dirname, "../../res/", file)
+        let content = fs.readFileSync(fullPath, "utf8")
         return JSON.parse(content)
     }
 

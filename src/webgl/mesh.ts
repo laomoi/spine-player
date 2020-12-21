@@ -48,10 +48,16 @@ export default class Mesh {
     public setImage(file:string) {
         this.texture = Texture.getTexture(file, this.renderer)
         this.vertsDirty = true
-        this.onSetImage()
+        this.onTextureSet()
     }
 
-    protected onSetImage() {
+    public setTexture(texture:Texture) {
+        this.texture = texture
+        this.vertsDirty = true
+        this.onTextureSet()
+    }
+
+    protected onTextureSet() {
         this.setShader(this.renderer.getDefaultShader())
     }
 
@@ -133,8 +139,8 @@ export default class Mesh {
 }
 
 export class Sprite extends Mesh {
-    public onSetImage() {
-        super.onSetImage()
+    public onTextureSet() {
+        super.onTextureSet()
         this.points = [
             [0, this.texture.imageHeight, 0, 1],                //左上角 x, y, u, v
             [0, 0, 0, 0],                                       //左下角

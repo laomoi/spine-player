@@ -10,8 +10,8 @@ export default class SpineDebugMesh extends Mesh {
         this.setImage("builtin/bone.png")
     }
 
-    protected onSetImage() {
-        super.onSetImage()
+    protected onTextureSet() {
+        super.onTextureSet()
         //一根骨骼使用4个顶点
         let bones = this.spine.getBones()
         let pointsCount = 4 * bones.length

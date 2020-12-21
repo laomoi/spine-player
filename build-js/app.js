@@ -4,7 +4,7 @@ const test_spine_1 = require("./examples/test-spine");
 const renderer_1 = require("./webgl/renderer");
 class App {
     constructor() {
-        this.showFPSCallback = null;
+        this.webCallback = null;
         this.renderer = null;
         this.test = new test_spine_1.default();
     }
@@ -21,10 +21,10 @@ class App {
         let loopWrap = (now) => {
             now *= 0.001;
             const deltaTime = now - then;
-            if (then > 0 && deltaTime > 0 && this.showFPSCallback != null) {
+            if (then > 0 && deltaTime > 0 && this.webCallback != null) {
                 if (now - lastShowFPS > 0.3) {
                     const fps = 1 / deltaTime;
-                    this.showFPSCallback(fps);
+                    this.webCallback("fps", fps);
                     lastShowFPS = now;
                 }
             }
@@ -34,8 +34,8 @@ class App {
         };
         loopWrap(0);
     }
-    setShowFPSCallback(callback) {
-        this.showFPSCallback = callback;
+    setCallback(callback) {
+        this.webCallback = callback;
     }
     loop() {
         this.test.run(this.renderer);

@@ -21,8 +21,10 @@
     } else {
         let fpsElem = document.getElementById("fps");
         app.setGL(gl, canvas.clientWidth, canvas.clientHeight)
-        app.setShowFPSCallback(function(fps) {
-            fpsElem.innerText = fps.toFixed(1) + ""
+        app.setCallback(function(event, data) {
+            if (event == "fps") {
+                fpsElem.innerText = data.toFixed(1) + ""
+            }
         })
         app.run()
     }

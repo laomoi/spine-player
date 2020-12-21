@@ -8,7 +8,7 @@ export default class App {
 
     protected gl:WebGLRenderingContext
 
-    protected showFPSCallback:any = null
+    protected webCallback:any = null
 
     protected renderer:Renderer = null
     protected width:number
@@ -31,13 +31,12 @@ export default class App {
         let loopWrap = (now:number) => {
             now *= 0.001                        
             const deltaTime = now - then    
-            if (then > 0 && deltaTime > 0 && this.showFPSCallback != null) {
+            if (then > 0 && deltaTime > 0 && this.webCallback != null) {
                 if (now - lastShowFPS > 0.3) {
                     const fps = 1 / deltaTime  
-                    this.showFPSCallback(fps)
+                    this.webCallback("fps", fps)
                     lastShowFPS = now
                 }
-                
             }      
             then = now     
             this.loop()
@@ -47,8 +46,8 @@ export default class App {
         loopWrap(0)
     }
 
-    public setShowFPSCallback(callback:any) {
-        this.showFPSCallback = callback
+    public setCallback(callback:any) {
+        this.webCallback = callback
     }
 
     protected loop() {

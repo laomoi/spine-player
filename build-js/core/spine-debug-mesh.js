@@ -7,8 +7,8 @@ class SpineDebugMesh extends mesh_1.default {
         this.spine = spine;
         this.setImage("builtin/bone.png");
     }
-    onSetImage() {
-        super.onSetImage();
+    onTextureSet() {
+        super.onTextureSet();
         let bones = this.spine.getBones();
         let pointsCount = 4 * bones.length;
         this.points = new Array(pointsCount);

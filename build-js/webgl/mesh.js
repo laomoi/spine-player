@@ -32,9 +32,14 @@ class Mesh {
     setImage(file) {
         this.texture = texture_1.default.getTexture(file, this.renderer);
         this.vertsDirty = true;
-        this.onSetImage();
+        this.onTextureSet();
     }
-    onSetImage() {
+    setTexture(texture) {
+        this.texture = texture;
+        this.vertsDirty = true;
+        this.onTextureSet();
+    }
+    onTextureSet() {
         this.setShader(this.renderer.getDefaultShader());
     }
     setShader(shader) {
@@ -103,8 +108,8 @@ class Mesh {
 }
 exports.default = Mesh;
 class Sprite extends Mesh {
-    onSetImage() {
-        super.onSetImage();
+    onTextureSet() {
+        super.onTextureSet();
         this.points = [
             [0, this.texture.imageHeight, 0, 1],
             [0, 0, 0, 0],

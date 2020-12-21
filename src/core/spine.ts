@@ -4,6 +4,8 @@ import SpineAnimation from "./spine-animation";
 import SpineBone from "./spine-bone";
 import SpineData, { AnimationJson } from "./spine-data";
 import SpineDebugMesh from "./spine-debug-mesh";
+import SpineMesh from "./spine-mesh";
+import SpineSlot from "./spine-slot";
 
 export default class Spine {
 
@@ -15,7 +17,9 @@ export default class Spine {
     protected debugMesh:SpineDebugMesh = null
     public showDebugMesh:boolean = true
 
-    protected mesh:Mesh
+
+    protected mesh:SpineMesh
+
     protected spineAnimation:SpineAnimation = null
 
     public x:number = 0 
@@ -67,6 +71,16 @@ export default class Spine {
         return this.bonesDict[name]
     }
 
+    public createMesh(renderer:Renderer, atlas:string, png:string) {
+        this.mesh = new SpineMesh(renderer)
+        this.mesh.setSpine(this)
+        this.mesh.createFromAtlas(atlas, png)
+    }
+
+    public getData():SpineData {
+        return this.data
+    }
+
     public setAnimation(animationName:string) {
         let animationJson:AnimationJson = this.data.getAnimationData(animationName)
         if (animationJson != null){
@@ -84,7 +98,6 @@ export default class Spine {
         }
 
         this.spineAnimation.update()
-
         this.updateBonesTransform()
     }
 
@@ -102,6 +115,11 @@ export default class Spine {
 
         //draw bone-debug-mesh
         //draw mesh
+
+        if (this.mesh) {
+            this.mesh.updateFromSpine()
+            this.mesh.draw()
+        }
 
         if (this.showDebugMesh){
             if (this.debugMesh == null) {

@@ -11,6 +11,12 @@ export interface BoneJson {
     parent?:string
 }
 
+export interface SlotJson {
+    name: string,
+    bone?: string,
+    attachment?:string
+}
+
 export interface AnimationKeyFrameJson {
     time?: number,
     angle?: number,
@@ -32,9 +38,24 @@ export interface AnimationJson {
     bones:{[k:string]:AnimationBoneJson}
 }
 
+export interface AttachmentJson {
+    x?: number,
+    y?: number,
+    width?:number,
+    height?:number,
+}
+
+export interface SkinJson {
+    name: string,
+    attachments:{[k:string]:{[k:string]:AttachmentJson}},
+}
+
+
 export interface SpineJson {
     bones:Array<BoneJson>,
-    animations:{[k:string]:AnimationJson}
+    slots:Array<SlotJson>,
+    animations:{[k:string]:AnimationJson},
+    skins:Array<SkinJson>,
 }
 
 export default class SpineData {
@@ -46,5 +67,13 @@ export default class SpineData {
 
     public getAnimationData(animationName:string):AnimationJson{
         return this.json.animations[animationName]
+    }
+
+    public getAnimationList():Array<string> {
+        let list = []
+        for (let k in this.json.animations) {
+            list.push(k)
+        }
+        return list
     }
 }

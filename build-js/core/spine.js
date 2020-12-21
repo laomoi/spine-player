@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spine_animation_1 = require("./spine-animation");
 const spine_bone_1 = require("./spine-bone");
 const spine_debug_mesh_1 = require("./spine-debug-mesh");
+const spine_mesh_1 = require("./spine-mesh");
 class Spine {
     constructor(data) {
         this.bones = [];
@@ -51,6 +52,14 @@ class Spine {
     getBone(name) {
         return this.bonesDict[name];
     }
+    createMesh(renderer, atlas, png) {
+        this.mesh = new spine_mesh_1.default(renderer);
+        this.mesh.setSpine(this);
+        this.mesh.createFromAtlas(atlas, png);
+    }
+    getData() {
+        return this.data;
+    }
     setAnimation(animationName) {
         let animationJson = this.data.getAnimationData(animationName);
         if (animationJson != null) {
@@ -74,6 +83,10 @@ class Spine {
         }
     }
     draw(renderer) {
+        if (this.mesh) {
+            this.mesh.updateFromSpine();
+            this.mesh.draw();
+        }
         if (this.showDebugMesh) {
             if (this.debugMesh == null) {
                 this.debugMesh = new spine_debug_mesh_1.default(renderer);
