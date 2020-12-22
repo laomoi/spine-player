@@ -98,6 +98,9 @@ class SpineAtlas {
         }
         console.log(this.regions);
     }
+    getRegion(name) {
+        return this.regions[name];
+    }
 }
 exports.default = SpineAtlas;
 //# sourceMappingURL=spine-atlas.js.map

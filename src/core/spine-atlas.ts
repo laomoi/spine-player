@@ -29,7 +29,6 @@ export default class SpineAtlas {
 
     protected regions:{[k:string]:AtlasRegion} = {}
 
-
     public constructor(atlas:string, png:string, renderer:Renderer) {
         this.texture = Texture.getTexture(png, renderer)
         let atlasContent = fs.readFileSync(path.join(__dirname, "../../res/" + atlas), "utf8")
@@ -124,5 +123,9 @@ export default class SpineAtlas {
  
         }
         console.log(this.regions)
+    }
+
+    public getRegion(name:string) {
+        return this.regions[name]
     }
 }

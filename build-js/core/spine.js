@@ -7,6 +7,7 @@ const spine_mesh_1 = require("./spine-mesh");
 class Spine {
     constructor(data) {
         this.bones = [];
+        this.sortedBones = [];
         this.bonesDict = {};
         this.debugMesh = null;
         this.showDebugMesh = true;
@@ -22,13 +23,14 @@ class Spine {
             let bone = new spine_bone_1.default();
             bone.setJson(b);
             this.bones.push(bone);
+            this.sortedBones.push(bone);
             this.bonesDict[bone.name] = bone;
         }
         let boneDepthDict = {};
         for (let bone of this.bones) {
             this.calBoneDepth(bone, boneDepthDict);
         }
-        this.bones.sort(function (a, b) {
+        this.sortedBones.sort(function (a, b) {
             return boneDepthDict[a.name] - boneDepthDict[b.name];
         });
     }
@@ -46,16 +48,16 @@ class Spine {
         }
         return dict[bone.name];
     }
-    getBones() {
-        return this.bones;
+    getSortedBones() {
+        return this.sortedBones;
     }
     getBone(name) {
         return this.bonesDict[name];
     }
-    createMesh(renderer, atlas, png) {
+    createMesh(renderer, atlas) {
         this.mesh = new spine_mesh_1.default(renderer);
         this.mesh.setSpine(this);
-        this.mesh.createFromAtlas(atlas, png);
+        this.mesh.createFromAtlas(atlas);
     }
     getData() {
         return this.data;
@@ -77,14 +79,14 @@ class Spine {
         this.updateBonesTransform();
     }
     updateBonesTransform() {
-        for (let bone of this.bones) {
+        for (let bone of this.sortedBones) {
             let parent = this.bonesDict[bone.parent];
             bone.updateTransform(parent);
         }
     }
     draw(renderer) {
         if (this.mesh) {
-            this.mesh.updateFromSpine();
+            this.mesh.updateFromSpineBones();
             this.mesh.draw();
         }
         if (this.showDebugMesh) {
@@ -92,7 +94,7 @@ class Spine {
                 this.debugMesh = new spine_debug_mesh_1.default(renderer);
                 this.debugMesh.setSpine(this);
             }
-            this.debugMesh.updateFromSpine();
+            this.debugMesh.updateFromSpineBones();
             this.debugMesh.draw();
         }
     }

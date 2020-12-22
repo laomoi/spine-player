@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spine_1 = require("../core/spine");
 const spine_data_1 = require("../core/spine-data");
 const spine_utils_1 = require("../core/spine-utils");
+const spine_atlas_1 = require("../core/spine-atlas");
 class TestSpine {
     constructor() {
         this._inited = false;
@@ -16,12 +17,15 @@ class TestSpine {
         let pngFile = "hero_alva.png";
         let spineData = new spine_data_1.default();
         spineData.setJson(spine_utils_1.default.readJsonFile(jsonFile));
-        let spine = new spine_1.default(spineData);
-        spine.setAnimation("attack02");
-        spine.createMesh(renderer, atlasFile, pngFile);
-        spine.x = 100;
-        spine.y = 100;
-        this.spines.push(spine);
+        let spineAtlas = new spine_atlas_1.default(atlasFile, pngFile, renderer);
+        for (let i = 0; i < 1; i++) {
+            let spine = new spine_1.default(spineData);
+            spine.setAnimation("attack02");
+            spine.createMesh(renderer, spineAtlas);
+            spine.x = 50 + 2 * i;
+            spine.y = 100;
+            this.spines.push(spine);
+        }
         this._inited = true;
     }
     run(renderer) {

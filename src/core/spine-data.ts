@@ -27,6 +27,11 @@ export interface AnimationKeyFrameJson {
 
 }
 
+export interface AnimationAttachmentKeyFrameJson {
+    time?: number,
+    name?:string,
+}
+
 export interface AnimationBoneJson {
     rotate?:Array<AnimationKeyFrameJson>,
     scale?:Array<AnimationKeyFrameJson>,
@@ -34,8 +39,14 @@ export interface AnimationBoneJson {
     shear?:Array<AnimationKeyFrameJson>,
 }
 
+
+export interface AnimationSlotJson {
+    attachment?:Array<AnimationAttachmentKeyFrameJson>,
+}
+
 export interface AnimationJson {
-    bones:{[k:string]:AnimationBoneJson}
+    bones:{[k:string]:AnimationBoneJson},
+    slots:{[k:string]:AnimationSlotJson}
 }
 
 export interface AttachmentJson {
@@ -43,6 +54,17 @@ export interface AttachmentJson {
     y?: number,
     width?:number,
     height?:number,
+    type?:string, //default region
+    //region
+    scaleX?:number,
+    scaleY?:number,
+    rotation?:number,
+    //mesh
+    uvs?: Array<number>,
+    triangles?: Array<number>,
+    vertices?: Array<number>,
+    hull?: number,
+    edges: Array<number>,
 }
 
 export interface SkinJson {

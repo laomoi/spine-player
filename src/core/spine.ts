@@ -1,6 +1,7 @@
 import Mesh from "../webgl/mesh";
 import Renderer from "../webgl/renderer";
 import SpineAnimation from "./spine-animation";
+import SpineAtlas from "./spine-atlas";
 import SpineBone from "./spine-bone";
 import SpineData, { AnimationJson } from "./spine-data";
 import SpineDebugMesh from "./spine-debug-mesh";
@@ -12,6 +13,7 @@ export default class Spine {
     protected data:SpineData
 
     protected bones:Array<SpineBone> = []
+    protected sortedBones:Array<SpineBone> = []
     protected bonesDict:{[k:string]:SpineBone} = {}
 
     protected debugMesh:SpineDebugMesh = null
@@ -37,6 +39,7 @@ export default class Spine {
             let bone = new SpineBone()
             bone.setJson(b)
             this.bones.push(bone)
+            this.sortedBones.push(bone)
             this.bonesDict[bone.name] = bone
         }
         //根据骨骼的父子关系，计算骨骼更新的先后顺序
@@ -44,7 +47,7 @@ export default class Spine {
         for (let bone of this.bones) {
             this.calBoneDepth(bone, boneDepthDict)
         }
-        this.bones.sort(function(a:any, b:any){
+        this.sortedBones.sort(function(a:any, b:any){
             return boneDepthDict[a.name] - boneDepthDict[b.name]
         })
     }
@@ -63,18 +66,18 @@ export default class Spine {
         return dict[bone.name]
     }
 
-    public getBones():Array<SpineBone> {
-        return this.bones
+    public getSortedBones():Array<SpineBone> {
+        return this.sortedBones
     }
 
     public getBone(name:string):SpineBone {
         return this.bonesDict[name]
     }
 
-    public createMesh(renderer:Renderer, atlas:string, png:string) {
+    public createMesh(renderer:Renderer, atlas:SpineAtlas) {
         this.mesh = new SpineMesh(renderer)
         this.mesh.setSpine(this)
-        this.mesh.createFromAtlas(atlas, png)
+        this.mesh.createFromAtlas(atlas)
     }
 
     public getData():SpineData {
@@ -102,22 +105,15 @@ export default class Spine {
     }
 
     protected updateBonesTransform(){
-        for (let bone of this.bones){
+        for (let bone of this.sortedBones){
             let parent = this.bonesDict[bone.parent]
             bone.updateTransform(parent)
         }
     }
 
     public draw(renderer:Renderer){
-        //update bone-debug-mesh
-        //update attached meshes
-        //fill vertex buffer
-
-        //draw bone-debug-mesh
-        //draw mesh
-
         if (this.mesh) {
-            this.mesh.updateFromSpine()
+            this.mesh.updateFromSpineBones()
             this.mesh.draw()
         }
 
@@ -126,7 +122,7 @@ export default class Spine {
                 this.debugMesh = new SpineDebugMesh(renderer)
                 this.debugMesh.setSpine(this)
             }
-            this.debugMesh.updateFromSpine()
+            this.debugMesh.updateFromSpineBones()
             this.debugMesh.draw()         
         }
     }

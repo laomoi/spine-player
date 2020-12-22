@@ -4,6 +4,7 @@ import path = require("path")
 import Spine from "../core/spine"
 import SpineData from "../core/spine-data"
 import SpineUtils from "../core/spine-utils"
+import SpineAtlas from "../core/spine-atlas"
 
 export default class TestSpine {
     
@@ -22,12 +23,17 @@ export default class TestSpine {
         let spineData = new SpineData()
         spineData.setJson(SpineUtils.readJsonFile(jsonFile))
 
-        let spine = new Spine(spineData)
-        spine.setAnimation("attack02")
-        spine.createMesh(renderer, atlasFile, pngFile) //不生成Mesh也可以，只展示骨骼动画，没有skin
-        spine.x = 100
-        spine.y = 100
-        this.spines.push(spine)
+        let spineAtlas = new SpineAtlas(atlasFile, pngFile, renderer)
+
+        for (let i=0;i<1;i++) {
+            let spine = new Spine(spineData)
+            spine.setAnimation("attack02")
+            spine.createMesh(renderer, spineAtlas) //不生成Mesh也可以，只展示骨骼动画，没有skin
+            spine.x = 50+ 2*i
+            spine.y = 100
+            this.spines.push(spine)
+        }
+        
         this._inited = true
     }
 

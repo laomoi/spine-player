@@ -7,6 +7,12 @@ class SpineSlot {
     setJson(json) {
         this.json = json;
         this.name = json.name;
+        this.bone = json.bone;
+        this.attachment = json.attachment;
+    }
+    updateAnimation() {
+    }
+    updateTransform() {
     }
 }
 exports.default = SpineSlot;

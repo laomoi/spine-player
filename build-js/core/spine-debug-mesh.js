@@ -9,7 +9,7 @@ class SpineDebugMesh extends mesh_1.default {
     }
     onTextureSet() {
         super.onTextureSet();
-        let bones = this.spine.getBones();
+        let bones = this.spine.getSortedBones();
         let pointsCount = 4 * bones.length;
         this.points = new Array(pointsCount);
         let indices = [];
@@ -22,9 +22,9 @@ class SpineDebugMesh extends mesh_1.default {
         }
         this.indices = new Uint16Array(indices);
     }
-    updateFromSpine() {
+    updateFromSpineBones() {
         let points = this.points;
-        let bones = this.spine.getBones();
+        let bones = this.spine.getSortedBones();
         let boneHeight = this.texture.imageHeight;
         for (let b = 0; b < bones.length; b++) {
             let bone = bones[b];
