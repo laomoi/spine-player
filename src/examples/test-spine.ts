@@ -28,10 +28,13 @@ export default class TestSpine {
         for (let i=0;i<1;i++) {
             let spine = new Spine(spineData)
             // spine.setAnimation("animation")
-            spine.createDebugMesh(renderer)
             spine.createMesh(renderer, spineAtlas) //不生成Mesh也可以，只展示骨骼动画，没有skin
+            spine.createDebugMesh(renderer)
+
             spine.x = 50+ 2*i
             spine.y = 100
+            // spine.update()
+            // spine.draw(renderer)
             this.spines.push(spine)
         }
         

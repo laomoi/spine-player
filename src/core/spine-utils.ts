@@ -17,4 +17,14 @@ export default class SpineUtils {
         return [newX, newY]
     }
 
+    public static updateTransformFromSRT(transform:Matrix4, rotation:number, scaleX:number, scaleY:number, shearX:number, shearY:number, x:number, y:number){
+        transform.identify()
+        let rotationX = (rotation + shearX)*SpineUtils.Deg2Radian
+        let rotationY = (rotation + shearY)*SpineUtils.Deg2Radian
+        transform.setValue(0, 0, Math.cos(rotationX)*scaleX)
+        transform.setValue(1, 0, Math.sin(rotationX)*scaleX)
+        transform.setValue(0, 1, -Math.sin(rotationY)*scaleY)
+        transform.setValue(1, 1, Math.cos(rotationY)*scaleY)
+        transform.setTranslate(x, y)
+    }
 }

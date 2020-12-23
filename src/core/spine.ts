@@ -85,7 +85,7 @@ export default class Spine {
     public createDebugMesh(renderer:Renderer) {
         let mesh = new SpineDebugMesh(renderer)
         mesh.setSpine(this)
-        this.meshes.unshift(mesh)
+        this.meshes.push(mesh)
     }
 
     public getData():SpineData {

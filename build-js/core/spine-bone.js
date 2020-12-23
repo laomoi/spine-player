@@ -34,16 +34,7 @@ class SpineBone {
         this.scaleY = this.setupPosValue.scaleY;
     }
     updateTransform(parent) {
-        this.localTransform.identify();
-        let rotationX = (this.rotation + this.shearX) * spine_utils_1.default.Deg2Radian;
-        let rotationY = (this.rotation + this.shearY) * spine_utils_1.default.Deg2Radian;
-        let scaleX = this.scaleX;
-        let scaleY = this.scaleY;
-        this.localTransform.setValue(0, 0, Math.cos(rotationX) * scaleX);
-        this.localTransform.setValue(1, 0, Math.sin(rotationX) * scaleX);
-        this.localTransform.setValue(0, 1, -Math.sin(rotationY) * scaleY);
-        this.localTransform.setValue(1, 1, Math.cos(rotationY) * scaleY);
-        this.localTransform.setTranslate(this.x, this.y);
+        spine_utils_1.default.updateTransformFromSRT(this.localTransform, this.rotation, this.scaleX, this.scaleY, this.shearX, this.shearY, this.x, this.y);
         if (parent) {
             this.localTransform.multiply(parent.worldTransform, this.worldTransform);
         }

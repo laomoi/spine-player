@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Attachment = void 0;
+const matrix4_1 = require("../webgl/matrix4");
 const mesh_1 = require("../webgl/mesh");
 const spine_slot_1 = require("./spine-slot");
 const spine_utils_1 = require("./spine-utils");
@@ -62,18 +63,23 @@ class Attachment {
         }
         else if (this.type == "region") {
             let points = [
-                [0, this.json.height, 0, 1],
-                [0, 0, 0, 0],
-                [this.json.width, this.json.height, 1, 1],
-                [this.json.width, 0, 1, 0]
+                [-this.json.width / 2, this.json.height / 2, 0, 1],
+                [-this.json.width / 2, -this.json.height / 2, 0, 0],
+                [this.json.width / 2, this.json.height / 2, 1, 1],
+                [this.json.width / 2, -this.json.height / 2, 1, 0]
             ];
             this.vertices = [];
+            let localTransform = new matrix4_1.default();
+            spine_utils_1.default.updateTransformFromSRT(localTransform, this.json.rotation != null ? this.json.rotation : 0, this.json.scaleX != null ? this.json.scaleX : 1, this.json.scaleY != null ? this.json.scaleY : 1, 0, 0, this.json.x != null ? this.json.x : 0, this.json.y != null ? this.json.y : 0);
             for (let p = 0; p < points.length; p++) {
                 let v = new AttachmentVertex();
                 v.x = points[p][0];
                 v.y = points[p][1];
                 v.u = points[p][2];
                 v.v = points[p][3];
+                let newPos = spine_utils_1.default.transformXYByMatrix(localTransform, v.x, v.y);
+                v.x = newPos[0];
+                v.y = newPos[1];
                 this.vertices.push(v);
             }
             this.triangles = [0, 1, 2, 1, 3, 2];
@@ -152,12 +158,12 @@ class SpineMesh extends mesh_1.default {
             let region = this.atlas.getRegion(slot.attachment);
             if (bone && attachment && region) {
                 let vertices = attachment.vertices;
-                let startIndex = points.length / 4;
+                let startIndex = points.length;
                 for (let vert of vertices) {
-                    let newPos = spine_utils_1.default.transformXYByMatrix(bone.worldTransform, vert.x + attachment.x, vert.y + attachment.y);
+                    let newPos = spine_utils_1.default.transformXYByMatrix(bone.worldTransform, vert.x, vert.y);
                     let realU = vert.u * region.uLen + region.u1;
                     let realV = vert.v * region.vLen + region.v1;
-                    points.push(newPos[0], newPos[1], realU, realV);
+                    points.push([newPos[0], newPos[1], realU, realV]);
                 }
                 for (let index of attachment.triangles) {
                     indices.push(index + startIndex);
@@ -166,6 +172,8 @@ class SpineMesh extends mesh_1.default {
         }
         this.points = points;
         this.indices = new Uint16Array(indices);
+        this.x = this.spine.x;
+        this.y = this.spine.y;
         this.setVertsDiry();
         this.setVertsIndexDiry();
     }

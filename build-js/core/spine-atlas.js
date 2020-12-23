@@ -92,9 +92,9 @@ class SpineAtlas {
             region.offsetX = frame.offset[0];
             region.offsetY = frame.offset[1];
             region.u1 = region.x / width;
-            region.v1 = region.y / height;
+            region.v1 = (height - region.y - region.height) / height;
             region.u2 = (region.x + region.width) / width;
-            region.v2 = (region.y + region.height) / height;
+            region.v2 = (height - region.y) / height;
             region.uLen = region.u2 - region.u1;
             region.vLen = region.v2 - region.v1;
         }
