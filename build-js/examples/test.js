@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mesh_1 = require("../webgl/mesh");
+const sprite_1 = require("../webgl/sprite");
 class Test {
     constructor() {
         this._inited = false;
         this.meshes = [];
     }
     init(renderer) {
-        let sprite1 = new mesh_1.Sprite(renderer);
+        let sprite1 = new sprite_1.default(renderer);
         sprite1.setImage("test.png");
         sprite1.x = 100;
         sprite1.y = 100;
         this.meshes.push(sprite1);
-        let sprite2 = new mesh_1.Sprite(renderer);
+        let sprite2 = new sprite_1.default(renderer);
         sprite2.setImage("test2.png");
         sprite2.x = 200;
         sprite2.y = 200;

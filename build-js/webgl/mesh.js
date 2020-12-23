@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Sprite = void 0;
 const texture_1 = require("./texture");
 class Mesh {
     constructor(renderer) {
@@ -11,6 +10,7 @@ class Mesh {
         this._x = 0;
         this._y = 0;
         this.vertsDirty = false;
+        this.vertsIndexDirty = false;
         this.vbo = null;
         this.ebo = null;
         this.renderer = renderer;
@@ -68,14 +68,10 @@ class Mesh {
         this.bytesPerVertex = bytesPerVertex;
         this.elementsCountPerVertex = elementsCountPerVertex;
     }
-    update() {
+    updateVertices() {
         if (this.vertices == null) {
             this.vertices = new Float32Array(this.points.length * this.elementsCountPerVertex);
         }
-        this.updateVertices();
-        this.vertsDirty = false;
-    }
-    updateVertices() {
         for (let p = 0; p < this.points.length; p++) {
             this.vertices[p * 4] = this.points[p][0] + this.x;
             this.vertices[p * 4 + 1] = this.points[p][1] + this.y;
@@ -91,10 +87,23 @@ class Mesh {
         if (this.ebo == null) {
             this.ebo = this.renderer.createEBO(this.indices);
         }
+        this.vertsDirty = false;
+    }
+    updateVerticesIndex() {
+        if (this.ebo == null) {
+            this.ebo = this.renderer.createEBO(this.indices);
+        }
+        else {
+            this.renderer.updateEBO(this.ebo, this.indices);
+        }
+        this.vertsIndexDirty = false;
     }
     draw() {
         if (this.vertsDirty) {
-            this.update();
+            this.updateVertices();
+        }
+        if (this.vertsIndexDirty) {
+            this.updateVerticesIndex();
         }
         this.renderer.useShader(this.shader.webglShader, this.uniforms);
         this.renderer.useTexture(this.texture.webglTexture, 0);
@@ -105,22 +114,9 @@ class Mesh {
     setVertsDiry() {
         this.vertsDirty = true;
     }
-}
-exports.default = Mesh;
-class Sprite extends Mesh {
-    onTextureSet() {
-        super.onTextureSet();
-        this.points = [
-            [0, this.texture.imageHeight, 0, 1],
-            [0, 0, 0, 0],
-            [this.texture.imageWidth, this.texture.imageHeight, 1, 1],
-            [this.texture.imageWidth, 0, 1, 0],
-        ];
-        this.indices = new Uint16Array([
-            0, 1, 2,
-            1, 3, 2
-        ]);
+    setVertsIndexDiry() {
+        this.vertsIndexDirty = true;
     }
 }
-exports.Sprite = Sprite;
+exports.default = Mesh;
 //# sourceMappingURL=mesh.js.map

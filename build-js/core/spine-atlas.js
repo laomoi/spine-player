@@ -18,7 +18,7 @@ class SpineAtlas {
     parseAtlas(content) {
         let lines = content.split(/\r\n|\n/);
         let regPng = /^(.*?\.png)/;
-        let regFrameName = /^(\w+)$/;
+        let regFrameName = /^([^:]+)$/;
         let headerKvReg = /^(\w+)\:\s*(.*)/;
         let kvReg = /\s+(\w+)\:\s*(.*)/;
         let doubleValueReg = /^(.*?),\s*(.*)/;
@@ -95,6 +95,8 @@ class SpineAtlas {
             region.v1 = region.y / height;
             region.u2 = (region.x + region.width) / width;
             region.v2 = (region.y + region.height) / height;
+            region.uLen = region.u2 - region.u1;
+            region.vLen = region.v2 - region.v1;
         }
         console.log(this.regions);
     }

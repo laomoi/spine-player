@@ -1,4 +1,5 @@
 import { SlotJson } from "./spine-data"
+import { Attachment } from "./spine-mesh"
 
 
 export default class SpineSlot {
@@ -16,7 +17,7 @@ export default class SpineSlot {
     }
 
     public updateAnimation() {
-        
+
     }
 
     public updateTransform(){

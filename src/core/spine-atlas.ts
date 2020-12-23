@@ -18,6 +18,8 @@ export class AtlasRegion {
     public v1:number
     public u2:number  //右下角
     public v2:number
+    public uLen:number
+    public vLen:number
 } 
 
 //todo, spine导出的纹理图集设置请关闭空白区域，旋转的勾选，简化uv计算逻辑
@@ -38,7 +40,7 @@ export default class SpineAtlas {
     protected parseAtlas(content:string) {
         let lines = content.split(/\r\n|\n/)
         let regPng = /^(.*?\.png)/
-        let regFrameName = /^(\w+)$/
+        let regFrameName = /^([^:]+)$/
         let headerKvReg = /^(\w+)\:\s*(.*)/
         let kvReg = /\s+(\w+)\:\s*(.*)/
         let doubleValueReg = /^(.*?),\s*(.*)/
@@ -120,7 +122,8 @@ export default class SpineAtlas {
             region.v1 = region.y / height
             region.u2 = (region.x + region.width) / width
             region.v2 = (region.y + region.height)/ height 
- 
+            region.uLen = region.u2 - region.u1
+            region.vLen = region.v2 - region.v1
         }
         console.log(this.regions)
     }

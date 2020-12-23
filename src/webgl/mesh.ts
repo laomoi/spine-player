@@ -20,6 +20,8 @@ export default class Mesh {
     protected bytesPerVertex:number
     protected elementsCountPerVertex:number
     protected vertsDirty:boolean = false
+    protected vertsIndexDirty:boolean = false
+
     public vbo:WebGLBuffer = null
     public ebo:WebGLBuffer = null
 
@@ -91,16 +93,10 @@ export default class Mesh {
         this.elementsCountPerVertex = elementsCountPerVertex 
     }
 
-
-    public update() {
+    protected updateVertices() {
         if (this.vertices == null) {
             this.vertices = new Float32Array(this.points.length * this.elementsCountPerVertex)
         } 
-        this.updateVertices()
-        this.vertsDirty = false
-    }
-
-    protected updateVertices() {
         //计算世界坐标
         for (let p=0;p<this.points.length;p++) {
             this.vertices[p*4] = this.points[p][0] + this.x
@@ -118,12 +114,24 @@ export default class Mesh {
         if (this.ebo == null) {
             this.ebo = this.renderer.createEBO(this.indices)
         } 
+        this.vertsDirty = false
     }
 
+    protected updateVerticesIndex() {
+        if (this.ebo == null) {
+            this.ebo = this.renderer.createEBO(this.indices)
+        } else {
+            this.renderer.updateEBO(this.ebo, this.indices)
+        }
+        this.vertsIndexDirty = false
+    }
 
     public draw() {
         if (this.vertsDirty) {
-            this.update()
+            this.updateVertices()
+        }
+        if (this.vertsIndexDirty) {
+            this.updateVerticesIndex()
         }
         this.renderer.useShader(this.shader.webglShader, this.uniforms)
         this.renderer.useTexture(this.texture.webglTexture, 0) //mesh use 1 texture currently
@@ -136,21 +144,9 @@ export default class Mesh {
         this.vertsDirty = true
     }
 
-}
-
-export class Sprite extends Mesh {
-    public onTextureSet() {
-        super.onTextureSet()
-        this.points = [
-            [0, this.texture.imageHeight, 0, 1],                //左上角 x, y, u, v
-            [0, 0, 0, 0],                                       //左下角
-            [this.texture.imageWidth, this.texture.imageHeight, 1, 1],  //右上角
-            [this.texture.imageWidth, 0, 1, 0],                         //右下角
-        ]
-        this.indices = new Uint16Array([
-            0, 1, 2,
-            1, 3, 2
-        ])
+    public setVertsIndexDiry(){
+        this.vertsIndexDirty = true
     }
 }
+
 

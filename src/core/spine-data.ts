@@ -24,7 +24,6 @@ export interface AnimationKeyFrameJson {
     y?: number,
     rotation?:number,
     curve?: string,
-
 }
 
 export interface AnimationAttachmentKeyFrameJson {
@@ -39,14 +38,21 @@ export interface AnimationBoneJson {
     shear?:Array<AnimationKeyFrameJson>,
 }
 
+export interface AnimationDeform {
+    time?: number,
+    vertices?:Array<number>,
+    curve?: string,
+    offset?:number,
+}
 
 export interface AnimationSlotJson {
     attachment?:Array<AnimationAttachmentKeyFrameJson>,
 }
 
 export interface AnimationJson {
-    bones:{[k:string]:AnimationBoneJson},
-    slots:{[k:string]:AnimationSlotJson}
+    bones?:{[k:string]:AnimationBoneJson},
+    slots?:{[k:string]:AnimationSlotJson},
+    deform?:{[k:string]:{[k:string]:{[k:string]:Array<AnimationDeform>}}}, //skin.slot.attachment
 }
 
 export interface AttachmentJson {

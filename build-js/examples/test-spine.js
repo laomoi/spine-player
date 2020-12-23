@@ -12,15 +12,15 @@ class TestSpine {
     init(renderer) {
         renderer.enableBlend();
         renderer.setAlphaBlendMode();
-        let jsonFile = "hero_alva.json";
-        let atlasFile = "hero_alva.atlas";
-        let pngFile = "hero_alva.png";
+        let jsonFile = "skeleton.json";
+        let atlasFile = "skeleton.atlas";
+        let pngFile = "skeleton.png";
         let spineData = new spine_data_1.default();
         spineData.setJson(spine_utils_1.default.readJsonFile(jsonFile));
         let spineAtlas = new spine_atlas_1.default(atlasFile, pngFile, renderer);
         for (let i = 0; i < 1; i++) {
             let spine = new spine_1.default(spineData);
-            spine.setAnimation("attack02");
+            spine.createDebugMesh(renderer);
             spine.createMesh(renderer, spineAtlas);
             spine.x = 50 + 2 * i;
             spine.y = 100;

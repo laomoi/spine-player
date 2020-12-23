@@ -1,5 +1,5 @@
 import Mesh from "../webgl/mesh";
-import Spine from "./spine";
+import Spine, { ISpineMesh } from "./spine";
 import SpineAtlas from "./spine-atlas";
 import { AttachmentJson, SkinJson } from "./spine-data";
 import SpineSlot from "./spine-slot";
@@ -24,12 +24,14 @@ class AttachmentVertex {
     }
 }
 
-class Attachment {
+export class Attachment {
     public type:string //region or mesh
     public isWeighted:boolean = false
     public json:AttachmentJson
-
-    protected vertices:Array<AttachmentVertex> = []
+    public triangles:Array<number> = []
+    public vertices:Array<AttachmentVertex> = []
+    public x:number
+    public y:number
 
     public setJson(json:AttachmentJson){
         this.json = json
@@ -57,6 +59,7 @@ class Attachment {
                     }
                     this.vertices.push(vertex)
                 }
+                this.triangles = this.json.triangles
             } else if (this.json.vertices.length == this.json.uvs.length) {
                 let count = this.json.vertices.length / 2
                 for (let c=0;c<count;c++){
@@ -65,6 +68,7 @@ class Attachment {
                     vertex.y = this.json.vertices[c*2+1]
                     this.vertices.push(vertex)
                 }
+                this.triangles = [0, 1, 2, 1, 3, 2]
             }
             //uv
             let count = this.json.uvs.length / 2
@@ -72,16 +76,33 @@ class Attachment {
                 this.vertices[c].u = this.json.uvs[c*2]
                 this.vertices[c].v = this.json.uvs[c*2+1]
             }
+        } else if (this.type == "region") {
+            let points =  
+            [
+                [0, this.json.height, 0, 1],                //左上角 x, y, u, v
+                [0, 0, 0, 0],                               //左下角
+                [this.json.width, this.json.height, 1, 1],  //右上角
+                [this.json.width, 0, 1, 0]
+            ]
+            this.vertices = []
+            for (let p=0;p<points.length;p++) {
+                let v = new AttachmentVertex()
+                v.x = points[p][0]
+                v.y = points[p][1]
+                v.u = points[p][2]
+                v.v = points[p][3]
+                this.vertices.push(v)
+            }
+            this.triangles = [0, 1, 2, 1, 3, 2]
         }
+
+        this.x = this.json.x || 0
+        this.y = this.json.y || 0
     }
 
-    public getVertexCount():number {
-        return this.vertices.length
-    }
 }
 
-
-export default class SpineMesh extends Mesh {
+export default class SpineMesh extends Mesh implements ISpineMesh {
     protected spine:Spine
 
     protected slots:Array<SpineSlot> = []
@@ -141,81 +162,47 @@ export default class SpineMesh extends Mesh {
         console.log(this.attachments)
     }
 
-    public getAttachment(slotName:string, attachmentName:string):Attachment {
-        return this.attachments[slotName][attachmentName]
-    }
-    
-    public updateFromSpineBones() {
-        // let points = this.points
-        // let bones = this.spine.getSortedBones()
-        // let boneHeight = this.texture.imageHeight
-        // for (let b=0;b<bones.length;b++) {
-        //     let bone = bones[b]
-        //     let pointsPerBone = [
-        //         [0, boneHeight/2, 0, 1],                        //左上角 x, y, u, v
-        //         [0, -boneHeight/2, 0, 0],                       //左下角
-        //         [bone.length, boneHeight/2, 1, 1],              //右上角
-        //         [bone.length, -boneHeight/2, 1, 0],             //右下角 
-        //     ]
-        //     for (let p=0;p<pointsPerBone.length;p++) {
-        //         let pt = pointsPerBone[p]
-        //         let newPos = SpineUtils.transformXYByMatrix(bone.worldTransform, pt[0], pt[1])
-        //         points[4*b+p] = [newPos[0], newPos[1], pt[2], pt[3]] //x, y, u, v
-        //     }
-        // }
-        // this.x = this.spine.x
-        // this.y = this.spine.y
-        // this.setVertsDiry()
+    public getAttachment(slot:SpineSlot) {
+        let animation = this.spine.getAnimation()
+        if (animation == null) {
+            return this.attachments[slot.name][slot.attachment]
+        }
+        return null
     }
 
+    public updateFromSpine() {
+        if (this.indices == null) {
+            //第一次初始化
 
+        }
 
-    protected onTextureSet() {
-        super.onTextureSet()
-        // //一根骨骼使用4个顶点
-        // let bones = this.spine.getSortedBones()
-        // let pointsCount = 4 * bones.length
-        // this.points = new Array<number>(pointsCount)
-        // let indices:Array<number> = []
-        // let indicesPerBone = [0, 1, 2, 1, 3, 2]
-        // for (let b=0;b<bones.length;b++) {
-        //     let startIndice = b*4
-        //     for (let index of indicesPerBone) {
-        //         indices.push(index + startIndice)
-        //     }
-        // }
-        // this.indices = new Uint16Array(indices)
-    }
+        //合并后计算出所有的顶点数据，索引数据
+        let indices:Array<number> = []
+        let points = []
+        for (let slot of this.slots) {
+            let bone = this.spine.getBone(slot.bone)
+            let attachment = this.getAttachment(slot)
+            let region = this.atlas.getRegion(slot.attachment)
+            if (bone && attachment && region) {
+                let vertices = attachment.vertices
+                let startIndex = points.length/4
+                for (let vert of vertices) {
+                    let newPos = SpineUtils.transformXYByMatrix(bone.worldTransform, vert.x + attachment.x, vert.y + attachment.y)
+                    let realU = vert.u * region.uLen + region.u1
+                    let realV = vert.v * region.vLen + region.v1
+                    points.push(newPos[0], newPos[1], realU, realV)
+                }
+                for (let index of attachment.triangles) {
+                    indices.push(index + startIndex)
+                }
+            }
+        }
+        this.points = points
+        this.indices = new Uint16Array(indices)
 
-
-    // public updateFromSpine() {
-    //     let points = this.points
-    //     let bones = this.spine.getBones()
-    //     let boneHeight = this.texture.imageHeight
-    //     for (let b=0;b<bones.length;b++) {
-    //         let bone = bones[b]
-    //         let pointsPerBone = [
-    //             [0, boneHeight/2, 0, 1],                        //左上角 x, y, u, v
-    //             [0, -boneHeight/2, 0, 0],                       //左下角
-    //             [bone.length, boneHeight/2, 1, 1],              //右上角
-    //             [bone.length, -boneHeight/2, 1, 0],             //右下角 
-    //         ]
-    //         for (let p=0;p<pointsPerBone.length;p++) {
-    //             let pt = pointsPerBone[p]
-    //             let newPos = SpineUtils.transformXYByMatrix(bone.worldTransform, pt[0], pt[1])
-    //             points[4*b+p] = [newPos[0], newPos[1], pt[2], pt[3]] //x, y, u, v
-    //         }
-    //     }
-    //     this.x = this.spine.x
-    //     this.y = this.spine.y
-    //     this.setVertsDiry()
-    // }
-
-    public update() {
+        this.setVertsDiry()
+        this.setVertsIndexDiry()
 
     }
 
-    public draw() {
-
-    }
 }

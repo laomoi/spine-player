@@ -9,14 +9,13 @@ class Spine {
         this.bones = [];
         this.sortedBones = [];
         this.bonesDict = {};
-        this.debugMesh = null;
-        this.showDebugMesh = true;
+        this.meshes = [];
         this.spineAnimation = null;
         this.x = 0;
         this.y = 0;
         this.data = data;
         this.createBones();
-        this.setupPos();
+        this.setupBones();
     }
     createBones() {
         for (let b of this.data.json.bones) {
@@ -55,9 +54,15 @@ class Spine {
         return this.bonesDict[name];
     }
     createMesh(renderer, atlas) {
-        this.mesh = new spine_mesh_1.default(renderer);
-        this.mesh.setSpine(this);
-        this.mesh.createFromAtlas(atlas);
+        let mesh = new spine_mesh_1.default(renderer);
+        mesh.setSpine(this);
+        mesh.createFromAtlas(atlas);
+        this.meshes.push(mesh);
+    }
+    createDebugMesh(renderer) {
+        let mesh = new spine_debug_mesh_1.default(renderer);
+        mesh.setSpine(this);
+        this.meshes.unshift(mesh);
     }
     getData() {
         return this.data;
@@ -68,8 +73,11 @@ class Spine {
             this.spineAnimation = new spine_animation_1.default(this, animationJson);
         }
     }
-    setupPos() {
+    setupBones() {
         this.updateBonesTransform();
+    }
+    getAnimation() {
+        return this.spineAnimation;
     }
     update() {
         if (this.spineAnimation == null) {
@@ -85,17 +93,9 @@ class Spine {
         }
     }
     draw(renderer) {
-        if (this.mesh) {
-            this.mesh.updateFromSpineBones();
-            this.mesh.draw();
-        }
-        if (this.showDebugMesh) {
-            if (this.debugMesh == null) {
-                this.debugMesh = new spine_debug_mesh_1.default(renderer);
-                this.debugMesh.setSpine(this);
-            }
-            this.debugMesh.updateFromSpineBones();
-            this.debugMesh.draw();
+        for (let mesh of this.meshes) {
+            mesh.updateFromSpine();
+            mesh.draw();
         }
     }
 }

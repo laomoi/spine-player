@@ -6,7 +6,12 @@ import SpineBone from "./spine-bone";
 import SpineData, { AnimationJson } from "./spine-data";
 import SpineDebugMesh from "./spine-debug-mesh";
 import SpineMesh from "./spine-mesh";
-import SpineSlot from "./spine-slot";
+
+
+export interface ISpineMesh {
+    updateFromSpine():void,
+    draw():void,
+}
 
 export default class Spine {
 
@@ -16,11 +21,7 @@ export default class Spine {
     protected sortedBones:Array<SpineBone> = []
     protected bonesDict:{[k:string]:SpineBone} = {}
 
-    protected debugMesh:SpineDebugMesh = null
-    public showDebugMesh:boolean = true
-
-
-    protected mesh:SpineMesh
+    protected meshes:Array<ISpineMesh> = []
 
     protected spineAnimation:SpineAnimation = null
 
@@ -31,7 +32,7 @@ export default class Spine {
     public constructor(data:SpineData) {
         this.data = data
         this.createBones()
-        this.setupPos()
+        this.setupBones()
     }
 
     protected createBones() {
@@ -75,9 +76,16 @@ export default class Spine {
     }
 
     public createMesh(renderer:Renderer, atlas:SpineAtlas) {
-        this.mesh = new SpineMesh(renderer)
-        this.mesh.setSpine(this)
-        this.mesh.createFromAtlas(atlas)
+        let mesh = new SpineMesh(renderer)
+        mesh.setSpine(this)
+        mesh.createFromAtlas(atlas)
+        this.meshes.push(mesh)
+    }
+
+    public createDebugMesh(renderer:Renderer) {
+        let mesh = new SpineDebugMesh(renderer)
+        mesh.setSpine(this)
+        this.meshes.unshift(mesh)
     }
 
     public getData():SpineData {
@@ -91,8 +99,12 @@ export default class Spine {
         }
     }
 
-    protected setupPos() {
+    protected setupBones() {
         this.updateBonesTransform()
+    }
+
+    public getAnimation():SpineAnimation {
+        return this.spineAnimation
     }
 
     public update(){
@@ -112,18 +124,9 @@ export default class Spine {
     }
 
     public draw(renderer:Renderer){
-        if (this.mesh) {
-            this.mesh.updateFromSpineBones()
-            this.mesh.draw()
-        }
-
-        if (this.showDebugMesh){
-            if (this.debugMesh == null) {
-                this.debugMesh = new SpineDebugMesh(renderer)
-                this.debugMesh.setSpine(this)
-            }
-            this.debugMesh.updateFromSpineBones()
-            this.debugMesh.draw()         
+        for (let mesh of this.meshes) {
+            mesh.updateFromSpine()
+            mesh.draw()
         }
     }
 

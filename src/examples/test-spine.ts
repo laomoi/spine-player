@@ -16,9 +16,9 @@ export default class TestSpine {
         renderer.enableBlend()
         renderer.setAlphaBlendMode()
 
-        let jsonFile = "hero_alva.json"
-        let atlasFile = "hero_alva.atlas"
-        let pngFile = "hero_alva.png"
+        let jsonFile = "skeleton.json"//hero_alva
+        let atlasFile = "skeleton.atlas"
+        let pngFile = "skeleton.png"
 
         let spineData = new SpineData()
         spineData.setJson(SpineUtils.readJsonFile(jsonFile))
@@ -27,7 +27,8 @@ export default class TestSpine {
 
         for (let i=0;i<1;i++) {
             let spine = new Spine(spineData)
-            spine.setAnimation("attack02")
+            // spine.setAnimation("animation")
+            spine.createDebugMesh(renderer)
             spine.createMesh(renderer, spineAtlas) //不生成Mesh也可以，只展示骨骼动画，没有skin
             spine.x = 50+ 2*i
             spine.y = 100

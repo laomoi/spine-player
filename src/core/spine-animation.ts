@@ -32,7 +32,6 @@ export default class SpineAnimation {
             this.currentTime = this.currentTime % this.maxTime
         }
         this.updateAnimation()
-        
     }
 
     protected updateAnimation() {
@@ -41,8 +40,6 @@ export default class SpineAnimation {
             this.applyInterFrame(boneName, boneAnimation, this.currentTime)
         }
     }
-
-
 
     protected getFrameValue(delta:number, initValue:number) {
         if (delta == null){

@@ -1,8 +1,9 @@
-import Mesh, { Sprite } from "../webgl/mesh"
+import Mesh from "../webgl/mesh"
 import Renderer from "../webgl/renderer"
 import fs = require("fs")
 import path = require("path")
 import Shader, { DefaultShader } from "../webgl/shader"
+import Sprite from "../webgl/sprite"
 
 export default class Test {
     

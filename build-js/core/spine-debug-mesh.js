@@ -22,7 +22,7 @@ class SpineDebugMesh extends mesh_1.default {
         }
         this.indices = new Uint16Array(indices);
     }
-    updateFromSpineBones() {
+    updateFromSpine() {
         let points = this.points;
         let bones = this.spine.getSortedBones();
         let boneHeight = this.texture.imageHeight;

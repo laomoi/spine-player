@@ -117,6 +117,11 @@ class Renderer {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
         return ebo;
     }
+    updateEBO(ebo, indices) {
+        let gl = this.gl;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
+        gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
+    }
     useEBO(ebo = null) {
         let gl = this.gl;
         if (ebo) {

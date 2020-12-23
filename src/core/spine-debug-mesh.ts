@@ -1,8 +1,8 @@
 import Mesh from "../webgl/mesh";
-import Spine from "./spine";
+import Spine, { ISpineMesh } from "./spine";
 import SpineUtils from "./spine-utils";
 
-export default class SpineDebugMesh extends Mesh {
+export default class SpineDebugMesh extends Mesh implements ISpineMesh {
     protected spine:Spine
 
     public setSpine(spine:Spine) {
@@ -27,8 +27,7 @@ export default class SpineDebugMesh extends Mesh {
         this.indices = new Uint16Array(indices)
     }
 
-
-    public updateFromSpineBones() {
+    public updateFromSpine() {
         let points = this.points
         let bones = this.spine.getSortedBones()
         let boneHeight = this.texture.imageHeight

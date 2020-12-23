@@ -138,6 +138,12 @@ export default class Renderer {
         return ebo
     }
 
+    public updateEBO(ebo:WebGLBuffer, indices:any) {
+        let gl = this.gl
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
+        gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW)
+    }
+
     public useEBO(ebo:WebGLBuffer=null) {
         let gl = this.gl
         if (ebo) {
