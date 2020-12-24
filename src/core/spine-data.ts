@@ -16,9 +16,11 @@ export interface SlotJson {
     bone?: string,
     attachment?:string
 }
-
 export interface AnimationKeyFrameJson {
-    time?: number,
+    time?: number
+}
+
+export interface AnimationBoneKeyFrameJson extends AnimationKeyFrameJson{
     angle?: number,
     x?: number,
     y?: number,
@@ -26,16 +28,15 @@ export interface AnimationKeyFrameJson {
     curve?: string,
 }
 
-export interface AnimationAttachmentKeyFrameJson {
-    time?: number,
+export interface AnimationAttachmentKeyFrameJson  extends AnimationKeyFrameJson {
     name?:string,
 }
 
 export interface AnimationBoneJson {
-    rotate?:Array<AnimationKeyFrameJson>,
-    scale?:Array<AnimationKeyFrameJson>,
-    translate?:Array<AnimationKeyFrameJson>,
-    shear?:Array<AnimationKeyFrameJson>,
+    rotate?:Array<AnimationBoneKeyFrameJson>,
+    scale?:Array<AnimationBoneKeyFrameJson>,
+    translate?:Array<AnimationBoneKeyFrameJson>,
+    shear?:Array<AnimationBoneKeyFrameJson>,
 }
 
 export interface AnimationDeform {

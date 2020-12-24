@@ -21,6 +21,7 @@ class SpineDebugMesh extends mesh_1.default {
                 }
             }
             this.indices = new Uint16Array(indices);
+            this.setVertsIndexDiry();
         }
         let points = this.points;
         let bones = this.spine.getSortedBones();

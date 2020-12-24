@@ -1,6 +1,6 @@
 import Spine from "./spine";
 import SpineBone from "./spine-bone";
-import { AnimationBoneJson, AnimationJson, AnimationKeyFrameJson } from "./spine-data";
+import { AnimationBoneJson, AnimationJson, AnimationBoneKeyFrameJson, AnimationKeyFrameJson, AnimationAttachmentKeyFrameJson } from "./spine-data";
 
 interface Interframe {
     start?: AnimationKeyFrameJson,
@@ -48,69 +48,77 @@ export default class SpineAnimation {
         return initValue + delta
     }
 
-    protected applyRotateInterFrameToBone(bone:SpineBone, frames:Array<AnimationKeyFrameJson>, time:number) {
+    protected applyRotateInterFrameToBone(bone:SpineBone, frames:Array<AnimationBoneKeyFrameJson>, time:number) {
         let interFrame = this.getInterFrameFactor(frames, time)
         if (interFrame) {
+            let startFrame = interFrame.start as AnimationBoneKeyFrameJson
+            let endFrame = interFrame.end as AnimationBoneKeyFrameJson
             if (interFrame.factor == null){
-                bone.rotation = this.getFrameValue(interFrame.end.angle, bone.setupPosValue.rotation)
+                bone.rotation = this.getFrameValue(endFrame.angle, bone.setupPosValue.rotation)
             } else if (interFrame.start && interFrame.end) {
-                let startValue = this.getFrameValue(interFrame.start.angle, bone.setupPosValue.rotation)
-                let endValue = this.getFrameValue(interFrame.end.angle, bone.setupPosValue.rotation)
-                bone.rotation = this.getInterValue(startValue, endValue, interFrame.start.curve, interFrame.factor)
+                let startValue = this.getFrameValue(startFrame.angle, bone.setupPosValue.rotation)
+                let endValue = this.getFrameValue(endFrame.angle, bone.setupPosValue.rotation)
+                bone.rotation = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
             }
         }
     }
 
-    protected applyTranslateInterFrameToBone(bone:SpineBone, frames:Array<AnimationKeyFrameJson>, time:number) {
+    protected applyTranslateInterFrameToBone(bone:SpineBone, frames:Array<AnimationBoneKeyFrameJson>, time:number) {
         let interFrame = this.getInterFrameFactor(frames, time)
         if (interFrame) {
+            let startFrame = interFrame.start as AnimationBoneKeyFrameJson
+            let endFrame = interFrame.end as AnimationBoneKeyFrameJson
             if (interFrame.factor == null){
-                bone.x = this.getFrameValue(interFrame.end.x, bone.setupPosValue.x)
-                bone.y = this.getFrameValue(interFrame.end.y, bone.setupPosValue.y)
+                bone.x = this.getFrameValue(endFrame.x, bone.setupPosValue.x)
+                bone.y = this.getFrameValue(endFrame.y, bone.setupPosValue.y)
             } else if (interFrame.start && interFrame.end) {
-                let startValue = this.getFrameValue(interFrame.start.x, bone.setupPosValue.x)
-                let endValue = this.getFrameValue(interFrame.end.x, bone.setupPosValue.x)
-                bone.x = this.getInterValue(startValue, endValue, interFrame.start.curve, interFrame.factor)
+                let startValue = this.getFrameValue(startFrame.x, bone.setupPosValue.x)
+                let endValue = this.getFrameValue(endFrame.x, bone.setupPosValue.x)
+                bone.x = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
 
-                startValue = this.getFrameValue(interFrame.start.y, bone.setupPosValue.y)
-                endValue = this.getFrameValue(interFrame.end.y, bone.setupPosValue.y)
-                bone.y = this.getInterValue(startValue, endValue, interFrame.start.curve, interFrame.factor)
+                startValue = this.getFrameValue(startFrame.y, bone.setupPosValue.y)
+                endValue = this.getFrameValue(endFrame.y, bone.setupPosValue.y)
+                bone.y = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
             }
         }
     }
 
-    protected applyScaleInterFrameToBone(bone:SpineBone, frames:Array<AnimationKeyFrameJson>, time:number) {
+    protected applyScaleInterFrameToBone(bone:SpineBone, frames:Array<AnimationBoneKeyFrameJson>, time:number) {
         let interFrame = this.getInterFrameFactor(frames, time)
         if (interFrame) {
+            let startFrame = interFrame.start as AnimationBoneKeyFrameJson
+            let endFrame = interFrame.end as AnimationBoneKeyFrameJson
             if (interFrame.factor == null){
-                bone.scaleX = this.getFrameValue(interFrame.end.x, bone.setupPosValue.x)
-                bone.scaleY = this.getFrameValue(interFrame.end.y, bone.setupPosValue.y)
+                bone.scaleX = this.getFrameValue(endFrame.x, bone.setupPosValue.scaleX)
+                bone.scaleY = this.getFrameValue(endFrame.y, bone.setupPosValue.scaleY)
             } else if (interFrame.start && interFrame.end) {
-                let startValue = this.getFrameValue(interFrame.start.x, bone.setupPosValue.scaleX)
-                let endValue = this.getFrameValue(interFrame.end.x, bone.setupPosValue.scaleX)
-                bone.scaleX = this.getInterValue(startValue, endValue, interFrame.start.curve, interFrame.factor)
+                let startValue = this.getFrameValue(startFrame.x, bone.setupPosValue.scaleX)
+                let endValue = this.getFrameValue(endFrame.x, bone.setupPosValue.scaleX)
+                bone.scaleX = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
 
-                startValue = this.getFrameValue(interFrame.start.y, bone.setupPosValue.scaleY)
-                endValue = this.getFrameValue(interFrame.end.y, bone.setupPosValue.scaleY)
-                bone.scaleY = this.getInterValue(startValue, endValue, interFrame.start.curve, interFrame.factor)
+                startValue = this.getFrameValue(startFrame.y, bone.setupPosValue.scaleY)
+                endValue = this.getFrameValue(endFrame.y, bone.setupPosValue.scaleY)
+                bone.scaleY = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
             }
         }
     }
 
-    protected applyShearInterFrameToBone(bone:SpineBone, frames:Array<AnimationKeyFrameJson>, time:number) {
+    protected applyShearInterFrameToBone(bone:SpineBone, frames:Array<AnimationBoneKeyFrameJson>, time:number) {
         let interFrame = this.getInterFrameFactor(frames, time)
         if (interFrame) {
+            let startFrame = interFrame.start as AnimationBoneKeyFrameJson
+            let endFrame = interFrame.end as AnimationBoneKeyFrameJson
             if (interFrame.factor == null){
-                bone.shearX = this.getFrameValue(interFrame.end.x, bone.setupPosValue.shearX)
-                bone.shearY = this.getFrameValue(interFrame.end.y, bone.setupPosValue.shearY)
+                bone.shearX = this.getFrameValue(endFrame.x, bone.setupPosValue.shearX)
+                bone.shearY = this.getFrameValue(endFrame.y, bone.setupPosValue.shearY)
             } else if (interFrame.start && interFrame.end) {
-                let startValue = this.getFrameValue(interFrame.start.x, bone.setupPosValue.shearX)
-                let endValue = this.getFrameValue(interFrame.end.x, bone.setupPosValue.shearX)
-                bone.shearX = this.getInterValue(startValue, endValue, interFrame.start.curve, interFrame.factor)
+                let startValue = this.getFrameValue(startFrame.x, bone.setupPosValue.shearX)
+                let endValue = this.getFrameValue(endFrame.x, bone.setupPosValue.shearX)
+                bone.shearX = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
 
-                startValue = this.getFrameValue(interFrame.start.y, bone.setupPosValue.shearY)
-                endValue = this.getFrameValue(interFrame.end.y, bone.setupPosValue.shearY)
-                bone.shearY = this.getInterValue(startValue, endValue, interFrame.start.curve, interFrame.factor)
+                startValue = this.getFrameValue(startFrame.y, bone.setupPosValue.shearY)
+                endValue = this.getFrameValue(endFrame.y, bone.setupPosValue.shearY)
+                bone.shearY = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
             }
         }
     }
@@ -199,5 +207,25 @@ export default class SpineAnimation {
             maxTime = Math.max(maxTime, this.getMaxTimeOfAnimationBone(boneAnimation))
         }
         return maxTime
+    }
+
+    public getAttachmentName(slotName:string) :string | null{
+        if (this.animationJson.slots == null){
+            return ""
+        }
+        let slotAnimation = this.animationJson.slots[slotName]
+        if (slotAnimation == null || slotAnimation.attachment == null){
+            return ""
+        }
+        let interFrame = this.getInterFrameFactor(slotAnimation.attachment, this.currentTime)
+        if (interFrame == null) {
+            return null
+        }
+        let startFrame = interFrame.start as AnimationAttachmentKeyFrameJson
+        let endFrame = interFrame.end as AnimationAttachmentKeyFrameJson
+        if (interFrame.factor == null) {
+            return endFrame.name
+        }
+        return startFrame.name
     }
 }

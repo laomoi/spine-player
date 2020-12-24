@@ -20,6 +20,7 @@ class TestSpine {
         let spineAtlas = new spine_atlas_1.default(atlasFile, pngFile, renderer);
         for (let i = 0; i < 1; i++) {
             let spine = new spine_1.default(spineData);
+            spine.setAnimation("animation");
             spine.createMesh(renderer, spineAtlas);
             spine.createDebugMesh(renderer);
             spine.x = 50 + 2 * i;

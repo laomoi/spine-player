@@ -138,18 +138,24 @@ class SpineMesh extends mesh_1.default {
                 this.attachments[slotName][attachmentName] = attachment;
             }
         }
-        console.log(this.attachments);
     }
     getAttachment(slot) {
         let animation = this.spine.getAnimation();
-        if (animation == null) {
-            return this.attachments[slot.name][slot.attachment];
+        let currentAttachment = slot.attachment;
+        if (animation != null) {
+            let animationAttachment = animation.getAttachmentName(slot.name);
+            if (animationAttachment == null) {
+                return null;
+            }
+            else if (animationAttachment == "") {
+            }
+            else {
+                currentAttachment = animationAttachment;
+            }
         }
-        return null;
+        return this.attachments[slot.name][currentAttachment];
     }
     preDraw() {
-        if (this.indices == null) {
-        }
         let indices = [];
         let points = [];
         for (let slot of this.slots) {

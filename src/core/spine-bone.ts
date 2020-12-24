@@ -63,5 +63,6 @@ export default class SpineBone {
         } else {
             this.worldTransform.setArrayValue(this.localTransform.arrayValue)
         }
+        console.log(this.worldTransform)
     }
 }

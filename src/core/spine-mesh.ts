@@ -174,22 +174,32 @@ export default class SpineMesh extends Mesh  {
                 this.attachments[slotName][attachmentName] = attachment
             }
         }
-        console.log(this.attachments)
+        // console.log(this.attachments)
     }
 
     public getAttachment(slot:SpineSlot) {
         let animation = this.spine.getAnimation()
-        if (animation == null) {
-            return this.attachments[slot.name][slot.attachment]
+        let currentAttachment = slot.attachment
+        if (animation != null) {
+            //因为attachment有关键帧切换操作，所有animation里可能存储了这个信息
+            let animationAttachment = animation.getAttachmentName(slot.name)
+            if (animationAttachment == null){
+                //这一帧不使用任何attachment
+                return null
+            } else if (animationAttachment == "") {
+                //不存在attachment切换
+            } else {
+                currentAttachment = animationAttachment
+            }
         }
-        return null
+        return this.attachments[slot.name][currentAttachment]
     }
 
 
     protected preDraw() {
-        if (this.indices == null) {
-            
-        }
+        // if (this.indices == null) {
+        //     //先不考虑性能方面的问题，每次都重新上传vbo+ebo, todo
+        // }
 
         //合并后计算出所有的顶点数据，索引数据
         let indices:Array<number> = []

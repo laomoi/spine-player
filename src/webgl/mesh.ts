@@ -105,10 +105,7 @@ export default class Mesh {
         } else {
             this.renderer.updateVBO(this.vbo, this.vertices)
         }
-
-        if (this.ebo == null) {
-            this.ebo = this.renderer.createEBO(this.indices)
-        } 
+        console.log(this.vertices)
         this.vertsDirty = false
     }
 
@@ -118,6 +115,7 @@ export default class Mesh {
         } else {
             this.renderer.updateEBO(this.ebo, this.indices)
         }
+        console.log(this.indices)
         this.vertsIndexDirty = false
     }
 

@@ -26,6 +26,7 @@ export default class SpineDebugMesh extends Mesh {
                 }
             }
             this.indices = new Uint16Array(indices)
+            this.setVertsIndexDiry()
         } 
 
         let points = this.points
