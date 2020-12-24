@@ -8,11 +8,6 @@ import SpineDebugMesh from "./spine-debug-mesh";
 import SpineMesh from "./spine-mesh";
 
 
-export interface ISpineMesh {
-    updateFromSpine():void,
-    draw():void,
-}
-
 export default class Spine {
 
     protected data:SpineData
@@ -21,7 +16,7 @@ export default class Spine {
     protected sortedBones:Array<SpineBone> = []
     protected bonesDict:{[k:string]:SpineBone} = {}
 
-    protected meshes:Array<ISpineMesh> = []
+    protected meshes:Array<Mesh> = []
 
     protected spineAnimation:SpineAnimation = null
 
@@ -125,7 +120,6 @@ export default class Spine {
 
     public draw(renderer:Renderer){
         for (let mesh of this.meshes) {
-            mesh.updateFromSpine()
             mesh.draw()
         }
     }

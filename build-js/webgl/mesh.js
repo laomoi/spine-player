@@ -14,6 +14,7 @@ class Mesh {
         this.vbo = null;
         this.ebo = null;
         this.renderer = renderer;
+        this.setShader(this.renderer.getDefaultShader());
     }
     get x() {
         return this._x;
@@ -32,15 +33,10 @@ class Mesh {
     setImage(file) {
         this.texture = texture_1.default.getTexture(file, this.renderer);
         this.vertsDirty = true;
-        this.onTextureSet();
     }
     setTexture(texture) {
         this.texture = texture;
         this.vertsDirty = true;
-        this.onTextureSet();
-    }
-    onTextureSet() {
-        this.setShader(this.renderer.getDefaultShader());
     }
     setShader(shader) {
         this.shader = shader;
@@ -98,7 +94,10 @@ class Mesh {
         }
         this.vertsIndexDirty = false;
     }
+    preDraw() {
+    }
     draw() {
+        this.preDraw();
         if (this.vertsDirty) {
             this.updateVertices();
         }

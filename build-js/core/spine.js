@@ -94,7 +94,6 @@ class Spine {
     }
     draw(renderer) {
         for (let mesh of this.meshes) {
-            mesh.updateFromSpine();
             mesh.draw();
         }
     }

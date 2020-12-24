@@ -27,6 +27,7 @@ export default class Mesh {
 
     constructor(renderer:Renderer) {
         this.renderer = renderer
+        this.setShader(this.renderer.getDefaultShader())
     }
 
     public get x():number {
@@ -50,17 +51,11 @@ export default class Mesh {
     public setImage(file:string) {
         this.texture = Texture.getTexture(file, this.renderer)
         this.vertsDirty = true
-        this.onTextureSet()
     }
 
     public setTexture(texture:Texture) {
         this.texture = texture
         this.vertsDirty = true
-        this.onTextureSet()
-    }
-
-    protected onTextureSet() {
-        this.setShader(this.renderer.getDefaultShader())
     }
 
     public setShader(shader:Shader) {
@@ -126,7 +121,13 @@ export default class Mesh {
         this.vertsIndexDirty = false
     }
 
+    protected preDraw() {
+
+    }
+
     public draw() {
+        this.preDraw()
+        
         if (this.vertsDirty) {
             this.updateVertices()
         }

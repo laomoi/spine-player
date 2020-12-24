@@ -147,7 +147,7 @@ class SpineMesh extends mesh_1.default {
         }
         return null;
     }
-    updateFromSpine() {
+    preDraw() {
         if (this.indices == null) {
         }
         let indices = [];

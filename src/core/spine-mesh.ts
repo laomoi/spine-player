@@ -1,6 +1,6 @@
 import Matrix4 from "../webgl/matrix4";
 import Mesh from "../webgl/mesh";
-import Spine, { ISpineMesh } from "./spine";
+import Spine from "./spine";
 import SpineAtlas from "./spine-atlas";
 import { AttachmentJson, SkinJson } from "./spine-data";
 import SpineSlot from "./spine-slot";
@@ -86,8 +86,7 @@ export class Attachment {
                 [this.json.width/2, -this.json.height/2, 1, 0]
             ]
             this.vertices = []
-            //attachment自身有transform?
-            //scale, roate, translate..
+            //attachment自身有transform? scale, roate, translate..
             let localTransform = new Matrix4()
             SpineUtils.updateTransformFromSRT(localTransform, 
                 this.json.rotation != null ? this.json.rotation:0, 
@@ -96,14 +95,13 @@ export class Attachment {
                 0, 0, 
                 this.json.x != null ? this.json.x:0, 
                 this.json.y != null ? this.json.y:0, 
-                )
+            )
             for (let p=0;p<points.length;p++) {
                 let v = new AttachmentVertex()
                 v.x = points[p][0]
                 v.y = points[p][1]
                 v.u = points[p][2]
                 v.v = points[p][3]
-
                 let newPos = SpineUtils.transformXYByMatrix(localTransform, v.x, v.y)
                 v.x = newPos[0]
                 v.y = newPos[1]
@@ -119,7 +117,7 @@ export class Attachment {
 
 }
 
-export default class SpineMesh extends Mesh implements ISpineMesh {
+export default class SpineMesh extends Mesh  {
     protected spine:Spine
 
     protected slots:Array<SpineSlot> = []
@@ -187,10 +185,10 @@ export default class SpineMesh extends Mesh implements ISpineMesh {
         return null
     }
 
-    public updateFromSpine() {
-        if (this.indices == null) {
-            //第一次初始化
 
+    protected preDraw() {
+        if (this.indices == null) {
+            
         }
 
         //合并后计算出所有的顶点数据，索引数据

@@ -1,8 +1,8 @@
 import Mesh from "../webgl/mesh";
-import Spine, { ISpineMesh } from "./spine";
+import Spine from "./spine";
 import SpineUtils from "./spine-utils";
 
-export default class SpineDebugMesh extends Mesh implements ISpineMesh {
+export default class SpineDebugMesh extends Mesh {
     protected spine:Spine
 
     public setSpine(spine:Spine) {
@@ -10,24 +10,24 @@ export default class SpineDebugMesh extends Mesh implements ISpineMesh {
         this.setImage("builtin/bone.png")
     }
 
-    protected onTextureSet() {
-        super.onTextureSet()
-        //一根骨骼使用4个顶点
-        let bones = this.spine.getSortedBones()
-        let pointsCount = 4 * bones.length
-        this.points = new Array<number>(pointsCount)
-        let indices:Array<number> = []
-        let indicesPerBone = [0, 1, 2, 1, 3, 2]
-        for (let b=0;b<bones.length;b++) {
-            let startIndice = b*4
-            for (let index of indicesPerBone) {
-                indices.push(index + startIndice)
+    protected preDraw() {
+        if (this.indices == null) {
+            //第一次draw
+            //一根骨骼使用4个顶点
+            let bones = this.spine.getSortedBones()
+            let pointsCount = 4 * bones.length
+            this.points = new Array<number>(pointsCount)
+            let indices:Array<number> = []
+            let indicesPerBone = [0, 1, 2, 1, 3, 2]
+            for (let b=0;b<bones.length;b++) {
+                let startIndice = b*4
+                for (let index of indicesPerBone) {
+                    indices.push(index + startIndice)
+                }
             }
-        }
-        this.indices = new Uint16Array(indices)
-    }
+            this.indices = new Uint16Array(indices)
+        } 
 
-    public updateFromSpine() {
         let points = this.points
         let bones = this.spine.getSortedBones()
         let boneHeight = this.texture.imageHeight
