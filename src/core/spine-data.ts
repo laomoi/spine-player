@@ -62,6 +62,7 @@ export interface AttachmentJson {
     width?:number,
     height?:number,
     type?:string, //default region
+    name?:string,
     //region
     scaleX?:number,
     scaleY?:number,

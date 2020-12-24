@@ -25,6 +25,13 @@ class AttachmentVertex {
     }
 }
 
+type Attachments = {[k:string]:{[k:string]:Attachment}}
+
+interface Skin {
+    name?:string,
+    attachments?: Attachments
+}
+
 export class Attachment {
     public type:string //region or mesh
     public isWeighted:boolean = false
@@ -33,10 +40,12 @@ export class Attachment {
     public vertices:Array<AttachmentVertex> = []
     public x:number
     public y:number
+    public name:string = ""
 
     public setJson(json:AttachmentJson){
         this.json = json
         this.type = json.type != null ? json.type : "region"
+        this.name = json.name != null ? json.name : ""
         if (this.type != "region" && this.type != "mesh"){
             console.warn("attchment type not supported now", this.type)
             return
@@ -69,13 +78,13 @@ export class Attachment {
                     vertex.y = this.json.vertices[c*2+1]
                     this.vertices.push(vertex)
                 }
-                this.triangles = [0, 1, 2, 1, 3, 2]
+                this.triangles = this.json.triangles
             }
             //uv
             let count = this.json.uvs.length / 2
             for (let c=0;c<count;c++){
                 this.vertices[c].u = this.json.uvs[c*2]
-                this.vertices[c].v = this.json.uvs[c*2+1]
+                this.vertices[c].v = 1 - this.json.uvs[c*2+1] //flip y
             }
         } else if (this.type == "region") {
             let points =  
@@ -86,31 +95,34 @@ export class Attachment {
                 [this.json.width/2, -this.json.height/2, 1, 0]
             ]
             this.vertices = []
-            //attachment自身有transform? scale, roate, translate..
-            let localTransform = new Matrix4()
-            SpineUtils.updateTransformFromSRT(localTransform, 
-                this.json.rotation != null ? this.json.rotation:0, 
-                this.json.scaleX != null ? this.json.scaleX:1 ,  
-                this.json.scaleY != null ? this.json.scaleY:1, 
-                0, 0, 
-                this.json.x != null ? this.json.x:0, 
-                this.json.y != null ? this.json.y:0, 
-            )
+           
             for (let p=0;p<points.length;p++) {
                 let v = new AttachmentVertex()
                 v.x = points[p][0]
                 v.y = points[p][1]
                 v.u = points[p][2]
                 v.v = points[p][3]
-                let newPos = SpineUtils.transformXYByMatrix(localTransform, v.x, v.y)
-                v.x = newPos[0]
-                v.y = newPos[1]
                 this.vertices.push(v)
             }
             
             this.triangles = [0, 1, 2, 1, 3, 2]
         }
-
+        //attachment自身有transform? scale, roate, translate..
+        let localTransform = new Matrix4()
+        SpineUtils.updateTransformFromSRT(localTransform, 
+            this.json.rotation != null ? this.json.rotation:0, 
+            this.json.scaleX != null ? this.json.scaleX:1 ,  
+            this.json.scaleY != null ? this.json.scaleY:1, 
+            0, 0, 
+            this.json.x != null ? this.json.x:0, 
+            this.json.y != null ? this.json.y:0, 
+        )
+        for (let p=0;p<this.vertices.length;p++) {
+            let vert = this.vertices[p]
+            let newPos = SpineUtils.transformXYByMatrix(localTransform, vert.x, vert.y)
+            vert.x = newPos[0]
+            vert.y = newPos[1]
+        }
         this.x = this.json.x || 0
         this.y = this.json.y || 0
     }
@@ -125,8 +137,8 @@ export default class SpineMesh extends Mesh  {
 
     protected atlas:SpineAtlas = null
 
-    protected defaultSkin:SkinJson 
-    protected attachments:{[k:string]:{[k:string]:Attachment}} = {}
+    protected defaultSkin:Skin = null
+    protected skins:Array<Skin> = []
 
     
     public setSpine(spine:Spine) {
@@ -153,31 +165,52 @@ export default class SpineMesh extends Mesh  {
     protected createAttachments() {
         let data = this.spine.getData()
         let skins = data.json.skins
-        for (let skin of skins) {
+        for (let skinJson of skins) {
+            let skin:Skin = {
+                name : skinJson.name
+            }
+            let attachments :Attachments = {}
+            for (let slotName in skinJson.attachments) {
+                for (let attachmentName in skinJson.attachments[slotName]) {
+                    let attachmentJson = skinJson.attachments[slotName][attachmentName]
+                    let attachment = new Attachment()
+                    attachment.setJson(attachmentJson)
+                    if (attachments[slotName] == null) {
+                        attachments[slotName] = {}
+                    }
+                    attachments[slotName][attachmentName] = attachment
+                }
+            }
+            skin.attachments = attachments
             if (skin.name == "default") {
                 this.defaultSkin = skin
-                break
+            } else {
+                this.skins.push(skin)
             }
         }
-        if (this.defaultSkin == null) {
-            this.defaultSkin = data.json.skins[0]
-        }
-
-        for (let slotName in this.defaultSkin.attachments) {
-            for (let attachmentName in this.defaultSkin.attachments[slotName]) {
-                let attachmentJson = this.defaultSkin.attachments[slotName][attachmentName]
-                let attachment = new Attachment()
-                attachment.setJson(attachmentJson)
-                if (this.attachments[slotName] == null) {
-                    this.attachments[slotName] = {}
-                }
-                this.attachments[slotName][attachmentName] = attachment
-            }
-        }
-        // console.log(this.attachments)
+     
+        console.log(this.skins, this.defaultSkin)
     }
 
+
+
     public getAttachment(slot:SpineSlot) {
+        let slotInfo = this.defaultSkin.attachments[slot.name]
+        if (slotInfo == null) {
+            for (let skin of this.skins) {
+                //这里没有做skin强制指定
+                slotInfo = skin.attachments[slot.name]
+                if (slotInfo != null ){
+                    break
+                }
+            }
+        }
+        
+        if (slotInfo == null){
+            console.log("cannot find attachement", slot.name)
+            return null
+        }
+
         let animation = this.spine.getAnimation()
         let currentAttachment = slot.attachment
         if (animation != null) {
@@ -192,7 +225,8 @@ export default class SpineMesh extends Mesh  {
                 currentAttachment = animationAttachment
             }
         }
-        return this.attachments[slot.name][currentAttachment]
+        
+        return slotInfo[currentAttachment]
     }
 
 
@@ -207,7 +241,11 @@ export default class SpineMesh extends Mesh  {
         for (let slot of this.slots) {
             let bone = this.spine.getBone(slot.bone)
             let attachment = this.getAttachment(slot)
-            let region = this.atlas.getRegion(slot.attachment)
+            let regionName = slot.attachment
+            if (attachment && attachment.name != "") {
+                regionName = attachment.name 
+            }
+            let region = this.atlas.getRegion(regionName)
             if (bone && attachment && region) {
                 let vertices = attachment.vertices
                 let startIndex = points.length

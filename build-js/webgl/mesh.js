@@ -80,7 +80,6 @@ class Mesh {
         else {
             this.renderer.updateVBO(this.vbo, this.vertices);
         }
-        console.log(this.vertices);
         this.vertsDirty = false;
     }
     updateVerticesIndex() {
@@ -90,7 +89,6 @@ class Mesh {
         else {
             this.renderer.updateEBO(this.ebo, this.indices);
         }
-        console.log(this.indices);
         this.vertsIndexDirty = false;
     }
     preDraw() {

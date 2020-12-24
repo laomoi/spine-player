@@ -12,18 +12,18 @@ class TestSpine {
     init(renderer) {
         renderer.enableBlend();
         renderer.setAlphaBlendMode();
-        let jsonFile = "skeleton.json";
-        let atlasFile = "skeleton.atlas";
-        let pngFile = "skeleton.png";
+        let jsonFile = "goblins-pro.json";
+        let atlasFile = "goblins-pro.atlas";
+        let pngFile = "goblins-pro.png";
         let spineData = new spine_data_1.default();
         spineData.setJson(spine_utils_1.default.readJsonFile(jsonFile));
         let spineAtlas = new spine_atlas_1.default(atlasFile, pngFile, renderer);
         for (let i = 0; i < 1; i++) {
             let spine = new spine_1.default(spineData);
-            spine.setAnimation("animation");
+            spine.setAnimation("walk");
             spine.createMesh(renderer, spineAtlas);
             spine.createDebugMesh(renderer);
-            spine.x = 50 + 2 * i;
+            spine.x = 150 + 2 * i;
             spine.y = 100;
             this.spines.push(spine);
         }

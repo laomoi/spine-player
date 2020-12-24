@@ -17,10 +17,12 @@ class Attachment {
         this.isWeighted = false;
         this.triangles = [];
         this.vertices = [];
+        this.name = "";
     }
     setJson(json) {
         this.json = json;
         this.type = json.type != null ? json.type : "region";
+        this.name = json.name != null ? json.name : "";
         if (this.type != "region" && this.type != "mesh") {
             console.warn("attchment type not supported now", this.type);
             return;
@@ -53,12 +55,12 @@ class Attachment {
                     vertex.y = this.json.vertices[c * 2 + 1];
                     this.vertices.push(vertex);
                 }
-                this.triangles = [0, 1, 2, 1, 3, 2];
+                this.triangles = this.json.triangles;
             }
             let count = this.json.uvs.length / 2;
             for (let c = 0; c < count; c++) {
                 this.vertices[c].u = this.json.uvs[c * 2];
-                this.vertices[c].v = this.json.uvs[c * 2 + 1];
+                this.vertices[c].v = 1 - this.json.uvs[c * 2 + 1];
             }
         }
         else if (this.type == "region") {
@@ -69,20 +71,23 @@ class Attachment {
                 [this.json.width / 2, -this.json.height / 2, 1, 0]
             ];
             this.vertices = [];
-            let localTransform = new matrix4_1.default();
-            spine_utils_1.default.updateTransformFromSRT(localTransform, this.json.rotation != null ? this.json.rotation : 0, this.json.scaleX != null ? this.json.scaleX : 1, this.json.scaleY != null ? this.json.scaleY : 1, 0, 0, this.json.x != null ? this.json.x : 0, this.json.y != null ? this.json.y : 0);
             for (let p = 0; p < points.length; p++) {
                 let v = new AttachmentVertex();
                 v.x = points[p][0];
                 v.y = points[p][1];
                 v.u = points[p][2];
                 v.v = points[p][3];
-                let newPos = spine_utils_1.default.transformXYByMatrix(localTransform, v.x, v.y);
-                v.x = newPos[0];
-                v.y = newPos[1];
                 this.vertices.push(v);
             }
             this.triangles = [0, 1, 2, 1, 3, 2];
+        }
+        let localTransform = new matrix4_1.default();
+        spine_utils_1.default.updateTransformFromSRT(localTransform, this.json.rotation != null ? this.json.rotation : 0, this.json.scaleX != null ? this.json.scaleX : 1, this.json.scaleY != null ? this.json.scaleY : 1, 0, 0, this.json.x != null ? this.json.x : 0, this.json.y != null ? this.json.y : 0);
+        for (let p = 0; p < this.vertices.length; p++) {
+            let vert = this.vertices[p];
+            let newPos = spine_utils_1.default.transformXYByMatrix(localTransform, vert.x, vert.y);
+            vert.x = newPos[0];
+            vert.y = newPos[1];
         }
         this.x = this.json.x || 0;
         this.y = this.json.y || 0;
@@ -95,7 +100,8 @@ class SpineMesh extends mesh_1.default {
         this.slots = [];
         this.slotsDict = {};
         this.atlas = null;
-        this.attachments = {};
+        this.defaultSkin = null;
+        this.skins = [];
     }
     setSpine(spine) {
         this.spine = spine;
@@ -118,28 +124,46 @@ class SpineMesh extends mesh_1.default {
     createAttachments() {
         let data = this.spine.getData();
         let skins = data.json.skins;
-        for (let skin of skins) {
+        for (let skinJson of skins) {
+            let skin = {
+                name: skinJson.name
+            };
+            let attachments = {};
+            for (let slotName in skinJson.attachments) {
+                for (let attachmentName in skinJson.attachments[slotName]) {
+                    let attachmentJson = skinJson.attachments[slotName][attachmentName];
+                    let attachment = new Attachment();
+                    attachment.setJson(attachmentJson);
+                    if (attachments[slotName] == null) {
+                        attachments[slotName] = {};
+                    }
+                    attachments[slotName][attachmentName] = attachment;
+                }
+            }
+            skin.attachments = attachments;
             if (skin.name == "default") {
                 this.defaultSkin = skin;
-                break;
+            }
+            else {
+                this.skins.push(skin);
             }
         }
-        if (this.defaultSkin == null) {
-            this.defaultSkin = data.json.skins[0];
-        }
-        for (let slotName in this.defaultSkin.attachments) {
-            for (let attachmentName in this.defaultSkin.attachments[slotName]) {
-                let attachmentJson = this.defaultSkin.attachments[slotName][attachmentName];
-                let attachment = new Attachment();
-                attachment.setJson(attachmentJson);
-                if (this.attachments[slotName] == null) {
-                    this.attachments[slotName] = {};
-                }
-                this.attachments[slotName][attachmentName] = attachment;
-            }
-        }
+        console.log(this.skins, this.defaultSkin);
     }
     getAttachment(slot) {
+        let slotInfo = this.defaultSkin.attachments[slot.name];
+        if (slotInfo == null) {
+            for (let skin of this.skins) {
+                slotInfo = skin.attachments[slot.name];
+                if (slotInfo != null) {
+                    break;
+                }
+            }
+        }
+        if (slotInfo == null) {
+            console.log("cannot find attachement", slot.name);
+            return null;
+        }
         let animation = this.spine.getAnimation();
         let currentAttachment = slot.attachment;
         if (animation != null) {
@@ -153,7 +177,7 @@ class SpineMesh extends mesh_1.default {
                 currentAttachment = animationAttachment;
             }
         }
-        return this.attachments[slot.name][currentAttachment];
+        return slotInfo[currentAttachment];
     }
     preDraw() {
         let indices = [];
@@ -161,7 +185,11 @@ class SpineMesh extends mesh_1.default {
         for (let slot of this.slots) {
             let bone = this.spine.getBone(slot.bone);
             let attachment = this.getAttachment(slot);
-            let region = this.atlas.getRegion(slot.attachment);
+            let regionName = slot.attachment;
+            if (attachment && attachment.name != "") {
+                regionName = attachment.name;
+            }
+            let region = this.atlas.getRegion(regionName);
             if (bone && attachment && region) {
                 let vertices = attachment.vertices;
                 let startIndex = points.length;

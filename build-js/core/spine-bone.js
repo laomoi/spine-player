@@ -41,7 +41,6 @@ class SpineBone {
         else {
             this.worldTransform.setArrayValue(this.localTransform.arrayValue);
         }
-        console.log(this.worldTransform);
     }
 }
 exports.default = SpineBone;
