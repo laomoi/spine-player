@@ -165,9 +165,6 @@ class SpineMesh extends mesh_1.default {
         console.log(this.skins, this.defaultSkin);
     }
     getAttachment(slot) {
-        if (slot.attachment == null) {
-            return null;
-        }
         let slotInfo = this.defaultSkin.attachments[slot.name];
         if (slotInfo == null) {
             for (let skin of this.skins) {

@@ -214,10 +214,10 @@ export default class SpineMesh extends Mesh  {
 
 
     public getAttachment(slot:SpineSlot) {
-        if (slot.attachment ==  null){
-            //console.log("no attachment of slot")
-            return null
-        }
+        // if (slot.attachment ==  null){
+        //     console.log("no attachment of slot", slot.name)
+        //     return null
+        // }
         let slotInfo = this.defaultSkin.attachments[slot.name]
         if (slotInfo == null) {
             for (let skin of this.skins) {

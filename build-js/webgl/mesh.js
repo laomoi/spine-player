@@ -65,7 +65,7 @@ class Mesh {
         this.elementsCountPerVertex = elementsCountPerVertex;
     }
     updateVertices() {
-        if (this.vertices == null) {
+        if (this.vertices == null || this.vertices.length != this.points.length * this.elementsCountPerVertex) {
             this.vertices = new Float32Array(this.points.length * this.elementsCountPerVertex);
         }
         for (let p = 0; p < this.points.length; p++) {

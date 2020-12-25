@@ -89,7 +89,7 @@ export default class Mesh {
     }
 
     protected updateVertices() {
-        if (this.vertices == null) {
+        if (this.vertices == null || this.vertices.length != this.points.length * this.elementsCountPerVertex) {
             this.vertices = new Float32Array(this.points.length * this.elementsCountPerVertex)
         } 
         //计算世界坐标

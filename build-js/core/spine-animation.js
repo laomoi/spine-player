@@ -188,6 +188,7 @@ class SpineAnimation {
         if (slotAnimation == null || slotAnimation.attachment == null) {
             return "";
         }
+        console.log("getAttachmentName", slotName, slotAnimation);
         let interFrame = this.getInterFrameFactor(slotAnimation.attachment, this.currentTime);
         if (interFrame == null) {
             return null;
