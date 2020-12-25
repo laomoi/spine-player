@@ -70,6 +70,11 @@ export default class Spine {
         return this.bonesDict[name]
     }
 
+    
+    public getBoneAt(index:number):SpineBone {
+        return this.bones[index]
+    }
+
     public createMesh(renderer:Renderer, atlas:SpineAtlas) {
         let mesh = new SpineMesh(renderer)
         mesh.setSpine(this)

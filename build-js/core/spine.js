@@ -53,6 +53,9 @@ class Spine {
     getBone(name) {
         return this.bonesDict[name];
     }
+    getBoneAt(index) {
+        return this.bones[index];
+    }
     createMesh(renderer, atlas) {
         let mesh = new spine_mesh_1.default(renderer);
         mesh.setSpine(this);

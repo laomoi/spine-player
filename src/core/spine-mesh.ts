@@ -2,6 +2,7 @@ import Matrix4 from "../webgl/matrix4";
 import Mesh from "../webgl/mesh";
 import Spine from "./spine";
 import SpineAtlas from "./spine-atlas";
+import SpineBone from "./spine-bone";
 import { AttachmentJson, SkinJson } from "./spine-data";
 import SpineSlot from "./spine-slot";
 import SpineUtils from "./spine-utils";
@@ -19,9 +20,36 @@ class AttachmentVertex {
     public u:number
     public v:number
 
-    public relatedBones:Array<WeightBone> = []
+    public localPos:Array<number> = null
 
-    public calPositionByBones() {
+    public relatedBones:Array<WeightBone> = []
+    protected attachment:Attachment = null
+
+    constructor(attachment:Attachment){
+        this.attachment = attachment
+    }
+
+    public calRealPos(spine:Spine, bone:SpineBone, slot:SpineSlot) :Array<number> {
+        if (this.attachment.type == "mesh" && this.attachment.isWeighted) {
+            //本地坐标为根据所有骨骼权重计算出来的
+            let newX:number=0, newY:number = 0
+            for (let weightBone of this.relatedBones) {
+                let bone = spine.getBoneAt(weightBone.boneIndex)
+                if (bone != null) {
+                    let newPos = SpineUtils.transformXYByMatrix(bone.worldTransform, weightBone.x, weightBone.y)
+                    newX += newPos[0] * weightBone.w
+                    newY += newPos[1] * weightBone.w
+                }
+            }
+            return [newX, newY]
+        } else {
+            //本地坐标为静态坐标
+            if (this.localPos == null) {
+                this.localPos = SpineUtils.transformXYByMatrix(this.attachment.localTransform, this.x, this.y)
+            }        
+            let newPos = SpineUtils.transformXYByMatrix(bone.worldTransform, this.localPos[0], this.localPos[1])
+            return newPos    
+        }
     }
 }
 
@@ -38,9 +66,8 @@ export class Attachment {
     public json:AttachmentJson
     public triangles:Array<number> = []
     public vertices:Array<AttachmentVertex> = []
-    public x:number
-    public y:number
     public name:string = ""
+    public localTransform:Matrix4 = new Matrix4()
 
     public setJson(json:AttachmentJson){
         this.json = json
@@ -57,7 +84,7 @@ export class Attachment {
                 let c = 0
                 while (c<this.json.vertices.length) {
                     let boneCount = this.json.vertices[c++]
-                    let vertex = new AttachmentVertex()
+                    let vertex = new AttachmentVertex(this)
                     for (let i=0;i<boneCount;i++){
                         let boneIndex = this.json.vertices[c++]
                         let x = this.json.vertices[c++]
@@ -73,7 +100,7 @@ export class Attachment {
             } else if (this.json.vertices.length == this.json.uvs.length) {
                 let count = this.json.vertices.length / 2
                 for (let c=0;c<count;c++){
-                    let vertex = new AttachmentVertex()
+                    let vertex = new AttachmentVertex(this)
                     vertex.x = this.json.vertices[c*2]
                     vertex.y = this.json.vertices[c*2+1]
                     this.vertices.push(vertex)
@@ -97,7 +124,7 @@ export class Attachment {
             this.vertices = []
            
             for (let p=0;p<points.length;p++) {
-                let v = new AttachmentVertex()
+                let v = new AttachmentVertex(this)
                 v.x = points[p][0]
                 v.y = points[p][1]
                 v.u = points[p][2]
@@ -107,9 +134,8 @@ export class Attachment {
             
             this.triangles = [0, 1, 2, 1, 3, 2]
         }
-        //attachment自身有transform? scale, roate, translate..
-        let localTransform = new Matrix4()
-        SpineUtils.updateTransformFromSRT(localTransform, 
+   
+        SpineUtils.updateTransformFromSRT(this.localTransform, 
             this.json.rotation != null ? this.json.rotation:0, 
             this.json.scaleX != null ? this.json.scaleX:1 ,  
             this.json.scaleY != null ? this.json.scaleY:1, 
@@ -117,14 +143,7 @@ export class Attachment {
             this.json.x != null ? this.json.x:0, 
             this.json.y != null ? this.json.y:0, 
         )
-        for (let p=0;p<this.vertices.length;p++) {
-            let vert = this.vertices[p]
-            let newPos = SpineUtils.transformXYByMatrix(localTransform, vert.x, vert.y)
-            vert.x = newPos[0]
-            vert.y = newPos[1]
-        }
-        this.x = this.json.x || 0
-        this.y = this.json.y || 0
+    
     }
 
 }
@@ -195,6 +214,10 @@ export default class SpineMesh extends Mesh  {
 
 
     public getAttachment(slot:SpineSlot) {
+        if (slot.attachment ==  null){
+            //console.log("no attachment of slot")
+            return null
+        }
         let slotInfo = this.defaultSkin.attachments[slot.name]
         if (slotInfo == null) {
             for (let skin of this.skins) {
@@ -226,7 +249,8 @@ export default class SpineMesh extends Mesh  {
             }
         }
         
-        return slotInfo[currentAttachment]
+        let attachment = slotInfo[currentAttachment]
+        return attachment
     }
 
 
@@ -250,7 +274,7 @@ export default class SpineMesh extends Mesh  {
                 let vertices = attachment.vertices
                 let startIndex = points.length
                 for (let vert of vertices) {
-                    let newPos = SpineUtils.transformXYByMatrix(bone.worldTransform, vert.x, vert.y)
+                    let newPos = vert.calRealPos(this.spine, bone, slot) 
                     let realU = vert.u * region.uLen + region.u1
                     let realV = vert.v * region.vLen + region.v1
                     points.push([newPos[0], newPos[1], realU, realV])
