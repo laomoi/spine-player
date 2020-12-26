@@ -27,4 +27,5 @@ export default class SpineUtils {
         transform.setValue(1, 1, Math.cos(rotationY)*scaleY)
         transform.setTranslate(x, y)
     }
+
 }

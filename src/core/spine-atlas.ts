@@ -126,7 +126,7 @@ export default class SpineAtlas {
             region.uLen = region.u2 - region.u1
             region.vLen = region.v2 - region.v1
         }
-        console.log(this.regions)
+        // console.log(this.regions)
     }
 
     public getRegion(name:string) {

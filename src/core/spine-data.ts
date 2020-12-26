@@ -22,6 +22,7 @@ export interface AnimationKeyFrameJson {
     c2?:number,
     c3?:number,
     c4?:number, //(c1,c2), (c3,c4) are the bezier-3 curve control points
+    cacheSamples?:Array<number> //for curve interpolation cache
 }
 
 export interface AnimationBoneKeyFrameJson extends AnimationKeyFrameJson{

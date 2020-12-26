@@ -5,7 +5,6 @@ import Spine from "../core/spine"
 import SpineData from "../core/spine-data"
 import SpineUtils from "../core/spine-utils"
 import SpineAtlas from "../core/spine-atlas"
-import Sprite from "../webgl/sprite"
 
 export default class TestSpine {
     
@@ -32,13 +31,16 @@ export default class TestSpine {
             let spine = new Spine(spineData)
             spine.setAnimation("walk")
             spine.createMesh(renderer, spineAtlas) //不生成Mesh也可以，只展示骨骼动画，没有skin
-            spine.createDebugMesh(renderer)
+            // spine.createDebugMesh(renderer)
 
             spine.x = 150 + 2*i
             spine.y = 100
             this.spines.push(spine)
         }
         
+        // let samples = SpineBezierUtils.splitCurveToSamples([0, 0.25, 0.75, 1.0 ], 10)
+        // let value = SpineBezierUtils.getInterValue(samples, 0.2, 1, 10)
+        // console.log(value)
         this._inited = true
     }
 

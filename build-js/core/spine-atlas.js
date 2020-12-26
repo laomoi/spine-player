@@ -98,7 +98,6 @@ class SpineAtlas {
             region.uLen = region.u2 - region.u1;
             region.vLen = region.v2 - region.v1;
         }
-        console.log(this.regions);
     }
     getRegion(name) {
         return this.regions[name];

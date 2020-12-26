@@ -192,7 +192,6 @@ class SpineMesh extends mesh_1.default {
                 this.skins.push(skin);
             }
         }
-        console.log(this.skins, this.defaultSkin);
     }
     getAttachment(slot) {
         let slotInfo = this.defaultSkin.attachments[slot.name];

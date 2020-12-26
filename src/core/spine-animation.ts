@@ -1,4 +1,5 @@
 import Spine from "./spine";
+import SpineBezierUtils from "./spine-bezier-utils";
 import SpineBone from "./spine-bone";
 import { AnimationBoneJson, AnimationJson, AnimationBoneKeyFrameJson, AnimationKeyFrameJson, AnimationAttachmentKeyFrameJson, AnimationDeformFrameJson } from "./spine-data";
 import { Attachment } from "./spine-mesh";
@@ -182,16 +183,21 @@ export default class SpineAnimation {
         if (curveType == "stepped") {
             return startValue
         } 
-        // else if (curveType != null) {
-        //     //curve bezier-3, (c1, c2), (c3, c4)
-        //     let c1 = parseFloat(curveType)
-        //     let value1:number
-        //     let value2:number
-        //     return startValue*((1-t)^3) + 
-        //     value1*3*(t*(1-t)^2) +
-        //     value2*3*(t^2*(1-t)) +
-        //        endValue*(t^3)
-        // }
+        else if (curveType != null) {
+            //curve bezier-3, (c1, c2), (c3, c4)
+            let c1 = parseFloat(curveType)
+            let c2 = curveFrame.c2 || 0
+            let c3 = curveFrame.c3 || 1
+            let c4 = curveFrame.c4 || 1
+            //cache samples
+            if (curveFrame.cacheSamples == null) {
+                curveFrame.cacheSamples = SpineBezierUtils.splitCurveToSamples([c1, c2, c3, c4], 10)
+            } 
+            let value= SpineBezierUtils.getInterValue(curveFrame.cacheSamples, t, startValue, endValue)   
+            // console.log("value", value)
+            return value    
+        }
+
         return startValue*(1-t) + endValue*t
     }
 

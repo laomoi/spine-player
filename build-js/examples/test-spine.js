@@ -22,7 +22,6 @@ class TestSpine {
             let spine = new spine_1.default(spineData);
             spine.setAnimation("walk");
             spine.createMesh(renderer, spineAtlas);
-            spine.createDebugMesh(renderer);
             spine.x = 150 + 2 * i;
             spine.y = 100;
             this.spines.push(spine);

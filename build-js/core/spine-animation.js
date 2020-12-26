@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const spine_bezier_utils_1 = require("./spine-bezier-utils");
 class SpineAnimation {
     constructor(spine, animationJson) {
         this.currentTime = 0;
@@ -154,6 +155,17 @@ class SpineAnimation {
         let curveType = curveFrame.curve;
         if (curveType == "stepped") {
             return startValue;
+        }
+        else if (curveType != null) {
+            let c1 = parseFloat(curveType);
+            let c2 = curveFrame.c2 || 0;
+            let c3 = curveFrame.c3 || 1;
+            let c4 = curveFrame.c4 || 1;
+            if (curveFrame.cacheSamples == null) {
+                curveFrame.cacheSamples = spine_bezier_utils_1.default.splitCurveToSamples([c1, c2, c3, c4], 10);
+            }
+            let value = spine_bezier_utils_1.default.getInterValue(curveFrame.cacheSamples, t, startValue, endValue);
+            return value;
         }
         return startValue * (1 - t) + endValue * t;
     }
