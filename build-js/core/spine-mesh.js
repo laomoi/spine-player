@@ -13,6 +13,7 @@ class AttachmentVertex {
         this.attachment = attachment;
     }
     calRealPos(spine, bone, slot) {
+        let animation = spine.getAnimation();
         if (this.attachment.type == "mesh" && this.attachment.isWeighted) {
             let newX = 0, newY = 0;
             for (let weightBone of this.relatedBones) {
@@ -24,6 +25,10 @@ class AttachmentVertex {
                 }
             }
             return [newX, newY];
+        }
+        else if (this.attachment.type == "mesh") {
+            let newPos = spine_utils_1.default.transformXYByMatrix(bone.worldTransform, this.x, this.y);
+            return newPos;
         }
         else {
             if (this.localPos == null) {
@@ -41,6 +46,15 @@ class Attachment {
         this.vertices = [];
         this.name = "";
         this.localTransform = new matrix4_1.default();
+        this.skin = null;
+        this.keyName = "";
+        this.setupVertices = [];
+    }
+    setSkin(skin) {
+        this.skin = skin;
+    }
+    setKeyName(keyName) {
+        this.keyName = keyName;
     }
     setJson(json) {
         this.json = json;
@@ -53,6 +67,7 @@ class Attachment {
         if (this.type == "mesh") {
             if (this.json.vertices.length > this.json.uvs.length) {
                 this.isWeighted = true;
+                this.setupVertices = [];
                 let c = 0;
                 while (c < this.json.vertices.length) {
                     let boneCount = this.json.vertices[c++];
@@ -65,18 +80,21 @@ class Attachment {
                         vertex.relatedBones.push({
                             x: x, y: y, w: w, boneIndex: boneIndex
                         });
+                        this.setupVertices.push(x, y);
                     }
                     this.vertices.push(vertex);
                 }
                 this.triangles = this.json.triangles;
             }
             else if (this.json.vertices.length == this.json.uvs.length) {
+                this.setupVertices = [];
                 let count = this.json.vertices.length / 2;
                 for (let c = 0; c < count; c++) {
                     let vertex = new AttachmentVertex(this);
                     vertex.x = this.json.vertices[c * 2];
                     vertex.y = this.json.vertices[c * 2 + 1];
                     this.vertices.push(vertex);
+                    this.setupVertices.push(vertex.x, vertex.y);
                 }
                 this.triangles = this.json.triangles;
             }
@@ -105,6 +123,16 @@ class Attachment {
             this.triangles = [0, 1, 2, 1, 3, 2];
         }
         spine_utils_1.default.updateTransformFromSRT(this.localTransform, this.json.rotation != null ? this.json.rotation : 0, this.json.scaleX != null ? this.json.scaleX : 1, this.json.scaleY != null ? this.json.scaleY : 1, 0, 0, this.json.x != null ? this.json.x : 0, this.json.y != null ? this.json.y : 0);
+    }
+    updateDeform(spine, bone, slot) {
+        if (this.type != "mesh") {
+            return;
+        }
+        let animation = spine.getAnimation();
+        if (animation == null) {
+            return;
+        }
+        animation.applyDeform(this.skin.name, slot.name, this);
     }
 }
 exports.Attachment = Attachment;
@@ -148,6 +176,8 @@ class SpineMesh extends mesh_1.default {
                     let attachmentJson = skinJson.attachments[slotName][attachmentName];
                     let attachment = new Attachment();
                     attachment.setJson(attachmentJson);
+                    attachment.setSkin(skin);
+                    attachment.setKeyName(attachmentName);
                     if (attachments[slotName] == null) {
                         attachments[slotName] = {};
                     }
@@ -175,7 +205,6 @@ class SpineMesh extends mesh_1.default {
             }
         }
         if (slotInfo == null) {
-            console.log("cannot find attachement", slot.name);
             return null;
         }
         let animation = this.spine.getAnimation();
@@ -206,6 +235,7 @@ class SpineMesh extends mesh_1.default {
             }
             let region = this.atlas.getRegion(regionName);
             if (bone && attachment && region) {
+                attachment.updateDeform(this.spine, bone, slot);
                 let vertices = attachment.vertices;
                 let startIndex = points.length;
                 for (let vert of vertices) {

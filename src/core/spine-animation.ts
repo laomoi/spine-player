@@ -1,6 +1,7 @@
 import Spine from "./spine";
 import SpineBone from "./spine-bone";
-import { AnimationBoneJson, AnimationJson, AnimationBoneKeyFrameJson, AnimationKeyFrameJson, AnimationAttachmentKeyFrameJson } from "./spine-data";
+import { AnimationBoneJson, AnimationJson, AnimationBoneKeyFrameJson, AnimationKeyFrameJson, AnimationAttachmentKeyFrameJson, AnimationDeformFrameJson } from "./spine-data";
+import { Attachment } from "./spine-mesh";
 
 interface Interframe {
     start?: AnimationKeyFrameJson,
@@ -58,7 +59,7 @@ export default class SpineAnimation {
             } else if (interFrame.start && interFrame.end) {
                 let startValue = this.getFrameValue(startFrame.angle, bone.setupPosValue.rotation)
                 let endValue = this.getFrameValue(endFrame.angle, bone.setupPosValue.rotation)
-                bone.rotation = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
+                bone.rotation = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
             }
         }
     }
@@ -74,11 +75,11 @@ export default class SpineAnimation {
             } else if (interFrame.start && interFrame.end) {
                 let startValue = this.getFrameValue(startFrame.x, bone.setupPosValue.x)
                 let endValue = this.getFrameValue(endFrame.x, bone.setupPosValue.x)
-                bone.x = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
+                bone.x = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
 
                 startValue = this.getFrameValue(startFrame.y, bone.setupPosValue.y)
                 endValue = this.getFrameValue(endFrame.y, bone.setupPosValue.y)
-                bone.y = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
+                bone.y = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
             }
         }
     }
@@ -94,11 +95,11 @@ export default class SpineAnimation {
             } else if (interFrame.start && interFrame.end) {
                 let startValue = this.getFrameValue(startFrame.x, bone.setupPosValue.scaleX)
                 let endValue = this.getFrameValue(endFrame.x, bone.setupPosValue.scaleX)
-                bone.scaleX = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
+                bone.scaleX = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
 
                 startValue = this.getFrameValue(startFrame.y, bone.setupPosValue.scaleY)
                 endValue = this.getFrameValue(endFrame.y, bone.setupPosValue.scaleY)
-                bone.scaleY = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
+                bone.scaleY = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
             }
         }
     }
@@ -114,11 +115,11 @@ export default class SpineAnimation {
             } else if (interFrame.start && interFrame.end) {
                 let startValue = this.getFrameValue(startFrame.x, bone.setupPosValue.shearX)
                 let endValue = this.getFrameValue(endFrame.x, bone.setupPosValue.shearX)
-                bone.shearX = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
+                bone.shearX = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
 
                 startValue = this.getFrameValue(startFrame.y, bone.setupPosValue.shearY)
                 endValue = this.getFrameValue(endFrame.y, bone.setupPosValue.shearY)
-                bone.shearY = this.getInterValue(startValue, endValue, startFrame.curve, interFrame.factor)
+                bone.shearY = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
             }
         }
     }
@@ -176,11 +177,22 @@ export default class SpineAnimation {
         return null
     }
 
-    protected getInterValue(startValue:number, endValue:number, curveType:string, factor:number){
+    protected getInterValue(startValue:number, endValue:number,  t:number, curveFrame:AnimationKeyFrameJson){
+        let curveType = curveFrame.curve
         if (curveType == "stepped") {
             return startValue
-        }
-        return startValue*(1-factor) + endValue*factor
+        } 
+        // else if (curveType != null) {
+        //     //curve bezier-3, (c1, c2), (c3, c4)
+        //     let c1 = parseFloat(curveType)
+        //     let value1:number
+        //     let value2:number
+        //     return startValue*((1-t)^3) + 
+        //     value1*3*(t*(1-t)^2) +
+        //     value2*3*(t^2*(1-t)) +
+        //        endValue*(t^3)
+        // }
+        return startValue*(1-t) + endValue*t
     }
 
     protected getMaxTimeOfAnimationBone(animation:AnimationBoneJson) {
@@ -217,7 +229,6 @@ export default class SpineAnimation {
         if (slotAnimation == null || slotAnimation.attachment == null){
             return ""
         }
-        console.log("getAttachmentName", slotName, slotAnimation)
         let interFrame = this.getInterFrameFactor(slotAnimation.attachment, this.currentTime)
         if (interFrame == null) {
             return null
@@ -228,5 +239,78 @@ export default class SpineAnimation {
             return endFrame.name
         }
         return startFrame.name
+    }
+
+    public applyDeform(skinName:string, slotName:string, attachment:Attachment) {
+        if (this.animationJson.deform == null) {
+            return
+        }
+        if (this.animationJson.deform[skinName] == null) {
+            return
+        }
+
+        if (this.animationJson.deform[skinName][slotName] == null) {
+            return
+        }
+        if (this.animationJson.deform[skinName][slotName][attachment.keyName] == null) {
+            return
+        }
+        let frames = this.animationJson.deform[skinName][slotName][attachment.keyName]
+        let interFrame = this.getInterFrameFactor(frames, this.currentTime)
+        if (interFrame == null) {
+            return
+        }
+        //setuppos mesh
+        let setupVertices = attachment.setupVertices
+        let startFrame = interFrame.start as AnimationDeformFrameJson
+        let endFrame = interFrame.end as AnimationDeformFrameJson
+        let finalVertices = [...setupVertices]
+        //根据插值结果赋值给finalVertices, 最后把finalVertices赋值回attachment.vertices
+        if (interFrame.factor == null) {
+            //直接赋值
+            let offset = endFrame.offset || 0
+            let deforms = endFrame.vertices || []
+            for (let o=offset;o<deforms.length;o++) {
+                finalVertices[o] = this.getFrameValue(deforms[o-offset], finalVertices[o] )
+            }
+        } else{
+            //插值
+            let offset1 = startFrame.offset || 0 
+            let deforms1 = startFrame.vertices || []
+            let deformLen1 = deforms1.length
+            let offset2 = endFrame.offset || 0
+            let deforms2 = endFrame.vertices || []            
+            let deformLen2 = deforms2.length
+            let offset = Math.min(offset1, offset2)
+            let offsetEnd = Math.max(offset1 + deformLen1, offset2 + deformLen2)
+            for (let o=offset;o<offsetEnd;o++) {
+                let startValue = finalVertices[o]
+                let endValue = finalVertices[o]
+                if (o >= offset1 && o <offset1 + deformLen1) {
+                    startValue = this.getFrameValue(deforms1[o-offset1], finalVertices[o] )
+                }
+                if (o >= offset2 && o <offset2 + deformLen2) {
+                    endValue = deforms2[o-offset2]
+                    endValue = this.getFrameValue(deforms2[o-offset2], finalVertices[o] )
+                }
+                finalVertices[o] = this.getInterValue(startValue, endValue, interFrame.factor, endFrame)
+            }
+        }
+
+        let index = 0
+        if (attachment.isWeighted) {
+            for (let vert of attachment.vertices) {
+                let relatedBones = vert.relatedBones
+                for (let boneInfo of relatedBones) {
+                    boneInfo.x = finalVertices[index++]
+                    boneInfo.y = finalVertices[index++]
+                }
+            }
+        } else {
+            for (let vert of attachment.vertices) {
+                vert.x = finalVertices[index++]
+                vert.y = finalVertices[index++]
+            }
+        }
     }
 }

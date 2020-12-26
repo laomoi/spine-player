@@ -30,8 +30,9 @@ class AttachmentVertex {
     }
 
     public calRealPos(spine:Spine, bone:SpineBone, slot:SpineSlot) :Array<number> {
-        if (this.attachment.type == "mesh" && this.attachment.isWeighted) {
-            //本地坐标为根据所有骨骼权重计算出来的
+        let animation = spine.getAnimation()
+
+        if (this.attachment.type == "mesh" && this.attachment.isWeighted) { 
             let newX:number=0, newY:number = 0
             for (let weightBone of this.relatedBones) {
                 let bone = spine.getBoneAt(weightBone.boneIndex)
@@ -42,8 +43,12 @@ class AttachmentVertex {
                 }
             }
             return [newX, newY]
+        } else if (this.attachment.type == "mesh") {
+            //普通mesh
+            let newPos = SpineUtils.transformXYByMatrix(bone.worldTransform, this.x, this.y)
+            return newPos
         } else {
-            //本地坐标为静态坐标
+            //region图片，本地坐标为静态坐标
             if (this.localPos == null) {
                 this.localPos = SpineUtils.transformXYByMatrix(this.attachment.localTransform, this.x, this.y)
             }        
@@ -68,6 +73,15 @@ export class Attachment {
     public vertices:Array<AttachmentVertex> = []
     public name:string = ""
     public localTransform:Matrix4 = new Matrix4()
+    public skin:Skin = null
+    public keyName:string = ""
+    public setupVertices:Array<number> = [] //x,y,x,y.., setup vertices is use for mesh deform
+    public setSkin(skin:Skin){
+        this.skin = skin
+    }
+    public setKeyName(keyName:string){
+        this.keyName = keyName
+    }
 
     public setJson(json:AttachmentJson){
         this.json = json
@@ -81,6 +95,7 @@ export class Attachment {
             //vertices=x1,y1,x2,y2 or boneCount,boneIndex1, boneX1, boneY1, w1,  boneIndex2, boneX2, boneY2, w2
             if (this.json.vertices.length > this.json.uvs.length) {
                 this.isWeighted = true
+                this.setupVertices = []
                 let c = 0
                 while (c<this.json.vertices.length) {
                     let boneCount = this.json.vertices[c++]
@@ -93,19 +108,23 @@ export class Attachment {
                         vertex.relatedBones.push({
                             x:x, y:y, w:w, boneIndex:boneIndex
                         })
+                        this.setupVertices.push(x, y)
                     }
                     this.vertices.push(vertex)
                 }
                 this.triangles = this.json.triangles
             } else if (this.json.vertices.length == this.json.uvs.length) {
+                this.setupVertices = []
                 let count = this.json.vertices.length / 2
                 for (let c=0;c<count;c++){
                     let vertex = new AttachmentVertex(this)
                     vertex.x = this.json.vertices[c*2]
                     vertex.y = this.json.vertices[c*2+1]
                     this.vertices.push(vertex)
+                    this.setupVertices.push(vertex.x, vertex.y)
                 }
                 this.triangles = this.json.triangles
+                
             }
             //uv
             let count = this.json.uvs.length / 2
@@ -113,6 +132,7 @@ export class Attachment {
                 this.vertices[c].u = this.json.uvs[c*2]
                 this.vertices[c].v = 1 - this.json.uvs[c*2+1] //flip y
             }
+            
         } else if (this.type == "region") {
             let points =  
             [
@@ -146,6 +166,16 @@ export class Attachment {
     
     }
 
+    public updateDeform(spine:Spine, bone:SpineBone, slot:SpineSlot) {
+        if (this.type != "mesh") {
+            return
+        }
+        let animation = spine.getAnimation()
+        if (animation == null) {
+            return
+        }
+        animation.applyDeform(this.skin.name, slot.name,  this)
+    }
 }
 
 export default class SpineMesh extends Mesh  {
@@ -194,6 +224,8 @@ export default class SpineMesh extends Mesh  {
                     let attachmentJson = skinJson.attachments[slotName][attachmentName]
                     let attachment = new Attachment()
                     attachment.setJson(attachmentJson)
+                    attachment.setSkin(skin)
+                    attachment.setKeyName(attachmentName)
                     if (attachments[slotName] == null) {
                         attachments[slotName] = {}
                     }
@@ -213,7 +245,7 @@ export default class SpineMesh extends Mesh  {
 
 
 
-    public getAttachment(slot:SpineSlot) {
+    public getAttachment(slot:SpineSlot):Attachment {
         // if (slot.attachment ==  null){
         //     console.log("no attachment of slot", slot.name)
         //     return null
@@ -230,7 +262,7 @@ export default class SpineMesh extends Mesh  {
         }
         
         if (slotInfo == null){
-            console.log("cannot find attachement", slot.name)
+            // console.log("cannot find attachement", slot.name)
             return null
         }
 
@@ -271,6 +303,8 @@ export default class SpineMesh extends Mesh  {
             }
             let region = this.atlas.getRegion(regionName)
             if (bone && attachment && region) {
+                //attachment is deform mesh? need to update by deform animation
+                attachment.updateDeform(this.spine, bone, slot)
                 let vertices = attachment.vertices
                 let startIndex = points.length
                 for (let vert of vertices) {

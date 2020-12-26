@@ -18,15 +18,23 @@ export interface SlotJson {
 }
 export interface AnimationKeyFrameJson {
     time?: number
+    curve?: string, //might be c1
+    c2?:number,
+    c3?:number,
+    c4?:number, //(c1,c2), (c3,c4) are the bezier-3 curve control points
 }
 
 export interface AnimationBoneKeyFrameJson extends AnimationKeyFrameJson{
     angle?: number,
     x?: number,
     y?: number,
-    rotation?:number,
-    curve?: string,
 }
+
+export interface AnimationDeformFrameJson  extends AnimationKeyFrameJson {
+    vertices?:Array<number>,
+    offset?:number,
+}
+
 
 export interface AnimationAttachmentKeyFrameJson  extends AnimationKeyFrameJson {
     name?:string,
@@ -39,12 +47,6 @@ export interface AnimationBoneJson {
     shear?:Array<AnimationBoneKeyFrameJson>,
 }
 
-export interface AnimationDeform {
-    time?: number,
-    vertices?:Array<number>,
-    curve?: string,
-    offset?:number,
-}
 
 export interface AnimationSlotJson {
     attachment?:Array<AnimationAttachmentKeyFrameJson>,
@@ -53,7 +55,7 @@ export interface AnimationSlotJson {
 export interface AnimationJson {
     bones?:{[k:string]:AnimationBoneJson},
     slots?:{[k:string]:AnimationSlotJson},
-    deform?:{[k:string]:{[k:string]:{[k:string]:Array<AnimationDeform>}}}, //skin.slot.attachment
+    deform?:{[k:string]:{[k:string]:{[k:string]:Array<AnimationDeformFrameJson>}}}, //skin.slot.attachment
 }
 
 export interface AttachmentJson {
