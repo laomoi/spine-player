@@ -19,8 +19,8 @@ export default class Mesh {
     protected vertices:Float32Array
     protected bytesPerVertex:number
     protected elementsCountPerVertex:number
-    protected vertsDirty:boolean = false
-    protected vertsIndexDirty:boolean = false
+    protected vertsDirty:boolean = true
+    protected vertsIndexDirty:boolean = true
 
     public vbo:WebGLBuffer = null
     public ebo:WebGLBuffer = null

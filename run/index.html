@@ -15,7 +15,7 @@
     let App = require("../build-js/app.js")
     let app = new App.default()
     let canvas = document.getElementById('canvas')
-    let gl = canvas.getContext('webgl')
+    let gl = canvas.getContext('webgl', { alpha: false }) 
     if (!gl) {
         console.log("WEBGL FAILED")
     } else {

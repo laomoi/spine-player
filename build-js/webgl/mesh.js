@@ -9,8 +9,8 @@ class Mesh {
         this.uniforms = [];
         this._x = 0;
         this._y = 0;
-        this.vertsDirty = false;
-        this.vertsIndexDirty = false;
+        this.vertsDirty = true;
+        this.vertsIndexDirty = true;
         this.vbo = null;
         this.ebo = null;
         this.renderer = renderer;

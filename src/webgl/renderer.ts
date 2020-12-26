@@ -19,7 +19,6 @@ export default class Renderer {
     }
 
     public clear() {
-        this.gl.clearColor(0, 0, 0, 1.0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
     }
 
