@@ -18,7 +18,7 @@ export default class TestSpine {
         renderer.enableBlend()
         renderer.setAlphaBlendMode()
 
-        let jsonFile = "goblins-pro.json"//hero_alva goblins-pro
+        let jsonFile = "goblins-pro.json"// goblins-pro
         let atlasFile = "goblins-pro.atlas"
         let pngFile = "goblins-pro.png"
 

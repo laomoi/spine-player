@@ -13,13 +13,13 @@ export default class Test {
     
     protected init(renderer:Renderer) {
         let sprite1 = new Sprite(renderer)
-        sprite1.setImage("test.png")
+        sprite1.setImage("skeleton.png.png")
         sprite1.x = 100
         sprite1.y = 100
         this.meshes.push(sprite1)
 
         let sprite2 = new Sprite(renderer)
-        sprite2.setImage("test2.png")
+        sprite2.setImage("skeleton.png.png")
         sprite2.x = 200
         sprite2.y = 200
         this.meshes.push(sprite2)
