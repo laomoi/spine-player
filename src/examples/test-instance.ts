@@ -53,7 +53,7 @@ export default class TestInstance {
     protected positionsArray:Float32Array = null
     protected positionBuffer:WebGLBuffer
     protected positionsLoc:number
-
+    protected instanceCount:number = 1000
     protected init(renderer:Renderer) {
         this._inited = true
         renderer.enableBlend()
@@ -73,8 +73,10 @@ export default class TestInstance {
         this.spine = spine
 
         //setup instancing data
-        for (let i=0;i<200;i++) {
-            this.positions.push(100 + Math.random()*700,  100 + Math.random()*500)
+        for (let i=0;i<this.instanceCount;i++) {
+            this.positions.push(100 + Math.random()*700)
+            this.positions.push(100 + Math.random()*500)
+
         }
         this.positionsArray = new Float32Array(this.positions)
         this.positionBuffer = renderer.createVBO(this.positionsArray)
@@ -87,9 +89,9 @@ export default class TestInstance {
         this.ext = ext
 
         let shader = new InstanceShader(renderer)
+
         this.mesh.setShader(shader)
         this.positionsLoc = shader.queryLocOfAttr("a_Position_instancing")
-        console.log(this.positionsLoc)
         // this.addDebugUI(renderer)
     }
 
@@ -114,20 +116,18 @@ export default class TestInstance {
         this.mesh.useTexture() //mesh use 1 texture currently
         this.mesh.useVBO()
         
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-        gl.enableVertexAttribArray(this.positionsLoc);
-        gl.vertexAttribPointer(this.positionsLoc, 2, gl.FLOAT, false, 2*Float32Array.BYTES_PER_ELEMENT, 0)
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer)
+        gl.enableVertexAttribArray(this.positionsLoc)
+        gl.vertexAttribPointer(this.positionsLoc, 2, gl.FLOAT, false, 0, 0)
         this.ext.vertexAttribDivisorANGLE(this.positionsLoc, 1)
 
         this.mesh.useEBO()
-
-        // gl.drawElements(gl.TRIANGLES, this.mesh.indices.length, gl.UNSIGNED_SHORT, 0)
         this.ext.drawElementsInstancedANGLE(
             gl.TRIANGLES,
-            6,  //elements count          
+            this.mesh.indices.length,  //elements count          
             gl.UNSIGNED_SHORT,  
             0,  //offset
-            200, //instance count
+            this.instanceCount, //instance count
         )
     }
 

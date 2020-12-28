@@ -34,6 +34,7 @@ class TestInstance {
         this.paused = false;
         this.positions = [];
         this.positionsArray = null;
+        this.instanceCount = 1000;
     }
     init(renderer) {
         this._inited = true;
@@ -49,8 +50,9 @@ class TestInstance {
         spine.setAnimation("animation");
         this.mesh = spine.createMesh(renderer, spineAtlas);
         this.spine = spine;
-        for (let i = 0; i < 200; i++) {
-            this.positions.push(100 + Math.random() * 700, 100 + Math.random() * 500);
+        for (let i = 0; i < this.instanceCount; i++) {
+            this.positions.push(100 + Math.random() * 700);
+            this.positions.push(100 + Math.random() * 500);
         }
         this.positionsArray = new Float32Array(this.positions);
         this.positionBuffer = renderer.createVBO(this.positionsArray);
@@ -63,7 +65,6 @@ class TestInstance {
         let shader = new InstanceShader(renderer);
         this.mesh.setShader(shader);
         this.positionsLoc = shader.queryLocOfAttr("a_Position_instancing");
-        console.log(this.positionsLoc);
     }
     run(renderer) {
         if (!this._inited) {
@@ -84,10 +85,10 @@ class TestInstance {
         this.mesh.useVBO();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
         gl.enableVertexAttribArray(this.positionsLoc);
-        gl.vertexAttribPointer(this.positionsLoc, 2, gl.FLOAT, false, 2 * Float32Array.BYTES_PER_ELEMENT, 0);
+        gl.vertexAttribPointer(this.positionsLoc, 2, gl.FLOAT, false, 0, 0);
         this.ext.vertexAttribDivisorANGLE(this.positionsLoc, 1);
         this.mesh.useEBO();
-        this.ext.drawElementsInstancedANGLE(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 200);
+        this.ext.drawElementsInstancedANGLE(gl.TRIANGLES, this.mesh.indices.length, gl.UNSIGNED_SHORT, 0, this.instanceCount);
     }
 }
 exports.default = TestInstance;
