@@ -107,6 +107,7 @@ export default class Spine {
         return this.spineAnimation
     }
 
+
     public update(){
         if (this.spineAnimation == null) {
             return

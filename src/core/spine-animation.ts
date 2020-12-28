@@ -50,6 +50,11 @@ export default class SpineAnimation {
         return initValue + delta
     }
 
+    
+    public getCurrentTime():number {
+        return this.currentTime
+    }
+
     protected applyRotateInterFrameToBone(bone:SpineBone, frames:Array<AnimationBoneKeyFrameJson>, time:number) {
         let interFrame = this.getInterFrameFactor(frames, time)
         if (interFrame) {
@@ -62,7 +67,7 @@ export default class SpineAnimation {
                 let endValue = this.getFrameValue(endFrame.angle, bone.setupPosValue.rotation)
                 bone.rotation = this.getInterValue(startValue, endValue, interFrame.factor, startFrame)
             }
-        }
+        }     
     }
 
     protected applyTranslateInterFrameToBone(bone:SpineBone, frames:Array<AnimationBoneKeyFrameJson>, time:number) {
@@ -194,7 +199,6 @@ export default class SpineAnimation {
                 curveFrame.cacheSamples = SpineBezierUtils.splitCurveToSamples([c1, c2, c3, c4], 10)
             } 
             let value= SpineBezierUtils.getInterValue(curveFrame.cacheSamples, t, startValue, endValue)   
-            // console.log("value", value)
             return value    
         }
 
