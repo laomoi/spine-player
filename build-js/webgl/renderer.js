@@ -12,6 +12,7 @@ class Renderer {
         this.height = height;
         this.matrixProjection = new matrix4_1.default();
         this.matrixProjection.setOrg(width, height);
+        this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
     }
     clear() {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

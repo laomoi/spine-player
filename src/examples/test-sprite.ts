@@ -5,7 +5,7 @@ import path = require("path")
 import Shader, { DefaultShader } from "../webgl/shader"
 import Sprite from "../webgl/sprite"
 
-export default class Test {
+export default class TestSprite {
     
     private _inited:boolean =false
 
@@ -13,13 +13,13 @@ export default class Test {
     
     protected init(renderer:Renderer) {
         let sprite1 = new Sprite(renderer)
-        sprite1.setImage("skeleton.png.png")
+        sprite1.setImage("skeleton.png")
         sprite1.x = 100
         sprite1.y = 100
         this.meshes.push(sprite1)
 
         let sprite2 = new Sprite(renderer)
-        sprite2.setImage("skeleton.png.png")
+        sprite2.setImage("skeleton.png")
         sprite2.x = 200
         sprite2.y = 200
         this.meshes.push(sprite2)

@@ -31,6 +31,9 @@ class SpineAnimation {
         }
         return initValue + delta;
     }
+    getCurrentTime() {
+        return this.currentTime;
+    }
     applyRotateInterFrameToBone(bone, frames, time) {
         let interFrame = this.getInterFrameFactor(frames, time);
         if (interFrame) {

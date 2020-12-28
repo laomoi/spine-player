@@ -51,7 +51,7 @@ class SpineBezierUtils {
             let t1 = curveSamples[i - 2];
             let t2 = curveSamples[i];
             if (t1 <= t && t <= t2) {
-                let percent = t1 + (t - t1) / (t2 - t1);
+                let percent = (t - t1) / (t2 - t1);
                 let y1 = curveSamples[i - 1];
                 let y2 = curveSamples[i + 1];
                 let y = y1 * (1 - percent) + y2 * percent;

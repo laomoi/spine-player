@@ -38,9 +38,6 @@ export default class TestSpine {
             this.spines.push(spine)
         }
         
-        // let samples = SpineBezierUtils.splitCurveToSamples([0, 0.25, 0.75, 1.0 ], 10)
-        // let value = SpineBezierUtils.getInterValue(samples, 0.2, 1, 10)
-        // console.log(value)
         this._inited = true
     }
 

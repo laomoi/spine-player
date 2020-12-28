@@ -1,6 +1,8 @@
-import Test from "./examples/test"
+import Test from "./examples/test-sprite"
 import TestSpine from "./examples/test-spine"
 import Renderer from "./webgl/renderer"
+import TestDebug from "./examples/test-debug"
+import TestInstance from "./examples/test-instance"
 
 
 
@@ -13,8 +15,10 @@ export default class App {
     protected renderer:Renderer = null
     protected width:number
     protected height:number
-    // protected test:Test = new Test()
-    protected test:TestSpine = new TestSpine()
+    // protected test:TestSprite = new TestSprite()
+    // protected test:TestSpine = new TestSpine()
+    // protected test:TestDebug = new TestDebug()
+    protected test:TestInstance = new TestInstance()
 
     public setGL(gl:WebGLRenderingContext, width:number, height:number) {
         this.gl = gl

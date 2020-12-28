@@ -16,6 +16,7 @@ export default class Renderer {
         this.height = height
         this.matrixProjection = new Matrix4()
         this.matrixProjection.setOrg(width, height)//投影矩阵, 2D里简单处理成： 把世界坐标转成[-1,1]的值
+        this.gl.clearColor(1.0, 1.0,1.0, 1.0)
     }
 
     public clear() {

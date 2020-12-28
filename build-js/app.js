@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const test_spine_1 = require("./examples/test-spine");
 const renderer_1 = require("./webgl/renderer");
+const test_instance_1 = require("./examples/test-instance");
 class App {
     constructor() {
         this.webCallback = null;
         this.renderer = null;
-        this.test = new test_spine_1.default();
+        this.test = new test_instance_1.default();
     }
     setGL(gl, width, height) {
         this.gl = gl;
