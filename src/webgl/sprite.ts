@@ -1,7 +1,7 @@
 import Mesh from "./mesh"
 
 export default class Sprite extends Mesh {
-    protected preDraw() {
+    public preDraw() {
         if (this.indices == null) {
             //第一次draw
             this.points = [

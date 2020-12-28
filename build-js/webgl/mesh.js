@@ -93,19 +93,34 @@ class Mesh {
     }
     preDraw() {
     }
-    draw() {
-        this.preDraw();
+    fillBuffers() {
         if (this.vertsDirty) {
             this.updateVertices();
         }
         if (this.vertsIndexDirty) {
             this.updateVerticesIndex();
         }
-        this.renderer.useShader(this.shader.webglShader, this.uniforms);
-        this.renderer.useTexture(this.texture.webglTexture, 0);
-        this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes);
-        this.renderer.useEBO(this.ebo);
+    }
+    draw() {
+        this.preDraw();
+        this.fillBuffers();
+        this.useShader();
+        this.useTexture();
+        this.useVBO();
+        this.useEBO();
         this.renderer.draw(this.indices.length, true);
+    }
+    useShader() {
+        this.renderer.useShader(this.shader.webglShader, this.uniforms);
+    }
+    useTexture() {
+        this.renderer.useTexture(this.texture.webglTexture, 0);
+    }
+    useVBO() {
+        this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes);
+    }
+    useEBO() {
+        this.renderer.useEBO(this.ebo);
     }
     setVertsDiry() {
         this.vertsDirty = true;

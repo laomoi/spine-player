@@ -85,11 +85,11 @@ class Renderer {
         let gl = this.gl;
         return gl.getAttribLocation(shaderProgram, name);
     }
-    createVBO(vertices) {
+    createVBO(buffer) {
         let gl = this.gl;
         let vbo = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.DYNAMIC_DRAW);
         return vbo;
     }
     updateVBO(vbo, vertexs) {
@@ -154,6 +154,12 @@ class Renderer {
             this.defaultShader = new shader_1.DefaultShader(this);
         }
         return this.defaultShader;
+    }
+    getExtension(name) {
+        return this.gl.getExtension(name);
+    }
+    getGL() {
+        return this.gl;
     }
 }
 exports.default = Renderer;

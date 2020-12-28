@@ -117,24 +117,44 @@ export default class Mesh {
         this.vertsIndexDirty = false
     }
 
-    protected preDraw() {
+    public preDraw() {
 
     }
 
-    public draw() {
-        this.preDraw()
-        
+    public fillBuffers() {
         if (this.vertsDirty) {
             this.updateVertices()
         }
         if (this.vertsIndexDirty) {
             this.updateVerticesIndex()
         }
-        this.renderer.useShader(this.shader.webglShader, this.uniforms)
-        this.renderer.useTexture(this.texture.webglTexture, 0) //mesh use 1 texture currently
-        this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes)
-        this.renderer.useEBO(this.ebo)
+    }
+
+    public draw() {
+        this.preDraw()
+        this.fillBuffers()
+        this.useShader()
+        this.useTexture() //mesh use 1 texture currently
+        this.useVBO()
+        this.useEBO()
+        
         this.renderer.draw(this.indices.length, true)
+    }
+
+    public useShader() {
+        this.renderer.useShader(this.shader.webglShader, this.uniforms)
+    }
+
+    public useTexture() {
+        this.renderer.useTexture(this.texture.webglTexture, 0) //mesh use 1 texture currently
+    }
+
+    public useVBO() {
+        this.renderer.useVBO(this.vbo, this.bytesPerVertex, this.attributes)
+    }
+
+    public useEBO() {
+        this.renderer.useEBO(this.ebo)
     }
 
     public setVertsDiry(){

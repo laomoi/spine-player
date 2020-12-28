@@ -10,7 +10,7 @@ export default class SpineDebugMesh extends Mesh {
         this.setImage("builtin/bone.png")
     }
 
-    protected preDraw() {
+    public preDraw() {
         if (this.indices == null) {
             //第一次draw
             //一根骨骼使用4个顶点

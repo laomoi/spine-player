@@ -281,7 +281,7 @@ export default class SpineMesh extends Mesh  {
     }
 
 
-    protected preDraw() {
+    public preDraw() {
         // if (this.indices == null) {
         //     //先不考虑性能方面的问题，每次都重新上传vbo+ebo, todo
         // }

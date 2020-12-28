@@ -28,6 +28,10 @@ export default class Shader {
     public onMeshUseShader(mesh:any) {
 
     }
+
+    public queryLocOfAttr(name:string) {
+        return this.renderer.getAttrLocation(this.webglShader, name)
+    }
 }
 
 export class DefaultShader extends Shader {
@@ -42,8 +46,8 @@ export class DefaultShader extends Shader {
     }
 
     protected onCreated() {
-        this.attributes.push({location: this.renderer.getAttrLocation(this.webglShader, "a_Position"), size: 2})
-        this.attributes.push({location: this.renderer.getAttrLocation(this.webglShader, "a_TexCoord"), size: 2})
+        this.attributes.push({location: this.queryLocOfAttr( "a_Position"), size: 2})
+        this.attributes.push({location: this.queryLocOfAttr("a_TexCoord"), size: 2})
     }
 
     public onMeshUseShader(mesh:any) {

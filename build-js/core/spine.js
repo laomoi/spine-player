@@ -61,11 +61,13 @@ class Spine {
         mesh.setSpine(this);
         mesh.createFromAtlas(atlas);
         this.meshes.push(mesh);
+        return mesh;
     }
     createDebugMesh(renderer) {
         let mesh = new spine_debug_mesh_1.default(renderer);
         mesh.setSpine(this);
         this.meshes.push(mesh);
+        return mesh;
     }
     getData() {
         return this.data;

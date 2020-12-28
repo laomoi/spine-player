@@ -100,11 +100,11 @@ export default class Renderer {
         return gl.getAttribLocation(shaderProgram, name)
     }
 
-    public createVBO(vertices:Float32Array ) {
+    public createVBO(buffer:Float32Array ) {
         let gl = this.gl
         let vbo = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW)
+        gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.DYNAMIC_DRAW)
         return vbo
     }
 
@@ -180,5 +180,13 @@ export default class Renderer {
             this.defaultShader = new DefaultShader(this)
         }
         return this.defaultShader
+    }
+
+    public getExtension(name:string) {
+        return this.gl.getExtension(name);
+    } 
+
+    public getGL():WebGLRenderingContext {
+        return this.gl
     }
 }

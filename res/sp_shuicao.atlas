@@ -1,0 +1,13 @@
+
+sp_shuicao.png
+size: 156,102
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+shuicao6
+  rotate: false
+  xy: 2, 2
+  size: 152, 98
+  orig: 152, 98
+  offset: 0, 0
+  index: -1

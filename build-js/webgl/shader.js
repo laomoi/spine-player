@@ -17,6 +17,9 @@ class Shader {
     }
     onMeshUseShader(mesh) {
     }
+    queryLocOfAttr(name) {
+        return this.renderer.getAttrLocation(this.webglShader, name);
+    }
 }
 exports.default = Shader;
 class DefaultShader extends Shader {
@@ -29,8 +32,8 @@ class DefaultShader extends Shader {
         this.onCreated();
     }
     onCreated() {
-        this.attributes.push({ location: this.renderer.getAttrLocation(this.webglShader, "a_Position"), size: 2 });
-        this.attributes.push({ location: this.renderer.getAttrLocation(this.webglShader, "a_TexCoord"), size: 2 });
+        this.attributes.push({ location: this.queryLocOfAttr("a_Position"), size: 2 });
+        this.attributes.push({ location: this.queryLocOfAttr("a_TexCoord"), size: 2 });
     }
     onMeshUseShader(mesh) {
         mesh.setUniform({ name: "u_Sampler", value: 0, type: SHADER_UNIFORM_TYPE.TYPE_1i });

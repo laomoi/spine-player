@@ -75,17 +75,19 @@ export default class Spine {
         return this.bones[index]
     }
 
-    public createMesh(renderer:Renderer, atlas:SpineAtlas) {
+    public createMesh(renderer:Renderer, atlas:SpineAtlas):SpineMesh {
         let mesh = new SpineMesh(renderer)
         mesh.setSpine(this)
         mesh.createFromAtlas(atlas)
         this.meshes.push(mesh)
+        return mesh
     }
 
-    public createDebugMesh(renderer:Renderer) {
+    public createDebugMesh(renderer:Renderer): SpineDebugMesh{
         let mesh = new SpineDebugMesh(renderer)
         mesh.setSpine(this)
         this.meshes.push(mesh)
+        return mesh
     }
 
     public getData():SpineData {
@@ -107,7 +109,7 @@ export default class Spine {
         return this.spineAnimation
     }
 
-
+  
     public update(){
         if (this.spineAnimation == null) {
             return
@@ -129,5 +131,6 @@ export default class Spine {
             mesh.draw()
         }
     }
+
 
 }
