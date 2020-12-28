@@ -59,6 +59,7 @@ export default class TestInstance {
         renderer.enableBlend()
         renderer.setAlphaBlendMode()
 
+        //setup spine
         let jsonFile = "sp_shuicao.json"// goblins-pro
         let atlasFile = "sp_shuicao.atlas"
         let pngFile = "sp_shuicao.png"
@@ -73,14 +74,6 @@ export default class TestInstance {
         this.spine = spine
 
         //setup instancing data
-        for (let i=0;i<this.instanceCount;i++) {
-            this.positions.push(100 + Math.random()*700)
-            this.positions.push(100 + Math.random()*500)
-
-        }
-        this.positionsArray = new Float32Array(this.positions)
-        this.positionBuffer = renderer.createVBO(this.positionsArray)
-
         let ext = renderer.getExtension("ANGLE_instanced_arrays")
         if (!ext) {
             console.error('need ANGLE_instanced_arrays')
@@ -88,8 +81,14 @@ export default class TestInstance {
         }
         this.ext = ext
 
-        let shader = new InstanceShader(renderer)
+        for (let i=0;i<this.instanceCount;i++) {
+            this.positions.push(100 + Math.random()*700)
+            this.positions.push(100 + Math.random()*500)
 
+        }
+        this.positionsArray = new Float32Array(this.positions)
+        this.positionBuffer = renderer.createVBO(this.positionsArray)
+        let shader = new InstanceShader(renderer)
         this.mesh.setShader(shader)
         this.positionsLoc = shader.queryLocOfAttr("a_Position_instancing")
         // this.addDebugUI(renderer)

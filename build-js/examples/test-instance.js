@@ -50,18 +50,18 @@ class TestInstance {
         spine.setAnimation("animation");
         this.mesh = spine.createMesh(renderer, spineAtlas);
         this.spine = spine;
-        for (let i = 0; i < this.instanceCount; i++) {
-            this.positions.push(100 + Math.random() * 700);
-            this.positions.push(100 + Math.random() * 500);
-        }
-        this.positionsArray = new Float32Array(this.positions);
-        this.positionBuffer = renderer.createVBO(this.positionsArray);
         let ext = renderer.getExtension("ANGLE_instanced_arrays");
         if (!ext) {
             console.error('need ANGLE_instanced_arrays');
             return;
         }
         this.ext = ext;
+        for (let i = 0; i < this.instanceCount; i++) {
+            this.positions.push(100 + Math.random() * 700);
+            this.positions.push(100 + Math.random() * 500);
+        }
+        this.positionsArray = new Float32Array(this.positions);
+        this.positionBuffer = renderer.createVBO(this.positionsArray);
         let shader = new InstanceShader(renderer);
         this.mesh.setShader(shader);
         this.positionsLoc = shader.queryLocOfAttr("a_Position_instancing");

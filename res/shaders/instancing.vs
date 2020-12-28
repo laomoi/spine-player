@@ -10,6 +10,4 @@ uniform mat4 P;
 void main(){
     gl_Position = P*vec4(a_Position.xy+a_Position_instancing, 0.0, 1.0);
     v_TexCoord = a_TexCoord;
-    v_color = a_Position_instancing;
-
 }
