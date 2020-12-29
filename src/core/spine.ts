@@ -119,7 +119,7 @@ export default class Spine {
         this.updateBonesTransform()
     }
 
-    protected updateBonesTransform(){
+    public updateBonesTransform(){
         for (let bone of this.sortedBones){
             let parent = this.bonesDict[bone.parent]
             bone.updateTransform(parent)

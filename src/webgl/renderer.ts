@@ -23,12 +23,12 @@ export default class Renderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
     }
 
-    public createTexture( n:number, image: HTMLImageElement | ImageBitmap=null, buffer:ArrayBufferView=null, width:number=0, height:number=0):WebGLTexture {
+    public createTexture( n:number, image: HTMLImageElement | ImageBitmap=null, buffer:ArrayBufferView=null, width:number=0, height:number=0, flipY:boolean=true):WebGLTexture {
         let gl = this.gl
         let texture:WebGLTexture = gl.createTexture()
         gl.activeTexture(gl.TEXTURE0 + n)
         gl.bindTexture(gl.TEXTURE_2D, texture)
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)  // flipy at web 
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY)  // flipy at web 
         if (buffer) {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0 ,gl.RGBA, gl.UNSIGNED_BYTE, buffer)
         } else {

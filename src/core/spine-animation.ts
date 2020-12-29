@@ -28,9 +28,13 @@ export default class SpineAnimation {
         this.updateAnimation()
     }
 
-    public update() {
-        this.currentTime += this.timePerUpdate
-        if (this.currentTime >= this.maxTime) {
+    public update(time:number=null) {
+        if (time != null) {
+            this.currentTime = time
+        } else {
+            this.currentTime += this.timePerUpdate
+        }
+        if (this.currentTime > this.maxTime) {
             this.currentTime = this.currentTime % this.maxTime
         }
         this.updateAnimation()
@@ -53,6 +57,10 @@ export default class SpineAnimation {
     
     public getCurrentTime():number {
         return this.currentTime
+    }
+
+    public getMaxTime():number {
+        return this.maxTime
     }
 
     protected applyRotateInterFrameToBone(bone:SpineBone, frames:Array<AnimationBoneKeyFrameJson>, time:number) {

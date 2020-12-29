@@ -10,8 +10,18 @@ export default class Texture {
         if (Texture.cache[file]) {
             return Texture.cache[file]
         }
-        Texture.cache[file] = new Texture(file, renderer)
-        return Texture.cache[file]
+        let texture = new Texture()
+        texture.loadFromFile(file, renderer)
+        Texture.cache[file] = texture
+        return texture
+    }
+
+    public static createFromWebglTexture(webglTexture:WebGLTexture, width:number, height:number){
+        let texture = new Texture()
+        texture.imageWidth = width
+        texture.imageHeight = height
+        texture.webglTexture = webglTexture
+        return texture
     }
 
     public imageWidth:number
@@ -19,7 +29,7 @@ export default class Texture {
     public imageData:any
     public webglTexture:WebGLTexture
 
-    constructor(file:string, renderer:Renderer) {
+    public loadFromFile(file:string, renderer:Renderer) {
         let {data, width, height} = decode(fs.readFileSync(path.join(__dirname, "../../res/" + file)))
         this.imageWidth = width
         this.imageHeight = height
