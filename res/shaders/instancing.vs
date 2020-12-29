@@ -2,7 +2,6 @@ attribute vec4 a_Position;
 attribute vec2 a_TexCoord;
 
 attribute vec2 a_Position_instancing;
-varying vec2 v_color;
 
 varying vec2 v_TexCoord;
 uniform mat4 P;
